@@ -4,6 +4,11 @@ import { authTiktok } from './platform/tiktok/auth'
 import { publishTiktok } from './platform/tiktok/publish'
 
 function initIpc(): void {
+  ipcMain.handle('ping', () => {
+    console.log('pong')
+    return 'pong'
+  })
+
   ipcMain.on('tiktok:auth', async () => {
     return authTiktok()
   })
