@@ -7,8 +7,8 @@ import { initIpc } from './ipc'
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1500,
-    height: 1000,
+    width: 1200,
+    height: 800,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
@@ -28,6 +28,8 @@ function createWindow(): void {
   })
 
   if (is.dev) {
+    // 在开发环境下设置窗口宽度，原有 + 500
+    mainWindow.setSize(mainWindow.getSize()[0] + 300, mainWindow.getSize()[1])
     mainWindow.loadURL('http://localhost:3000')
     mainWindow.webContents.openDevTools()
   } else {
