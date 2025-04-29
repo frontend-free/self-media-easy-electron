@@ -77,7 +77,7 @@ async function authTiktok(): Promise<PlatformResult> {
         })
         if (platformIdElement) {
           const platformId = await platformIdElement.textContent()
-          data.platformId = platformId ?? undefined
+          data.platformId = platformId ? platformId.match(/\d+/)?.[0] : undefined
         }
 
         // TODO 获取头像
