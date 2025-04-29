@@ -4,12 +4,13 @@ enum EnumPlatform {
 
 interface PlatformResult {
   success: boolean
-  data?: {
+  data: {
     platform: EnumPlatform
     platformName?: string
     platformAvatar?: string
     platformId?: string
     authInfo?: string
+    logs?: string[]
   }
   message?: string
 }

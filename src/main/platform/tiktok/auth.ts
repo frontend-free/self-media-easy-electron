@@ -10,7 +10,8 @@ async function authTiktok(): Promise<PlatformResult> {
     platformName: undefined,
     platformAvatar: undefined,
     platformId: undefined,
-    authInfo: undefined
+    authInfo: undefined,
+    logs: []
   }
 
   // 显示浏览器窗口
@@ -29,7 +30,8 @@ async function authTiktok(): Promise<PlatformResult> {
       task: async () => {
         // 未登录会调整到扫码页面 creator.douyin.com
         await page.goto(HOME)
-      }
+      },
+      logs: data.logs
     })
 
     await runTask({
@@ -40,7 +42,8 @@ async function authTiktok(): Promise<PlatformResult> {
           // 5分钟超时
           timeout: 5 * 60 * 1000
         })
-      }
+      },
+      logs: data.logs
     })
 
     await runTask({
@@ -52,8 +55,9 @@ async function authTiktok(): Promise<PlatformResult> {
         // 保存 cookies
         data.authInfo = JSON.stringify(cookies)
 
-        console.log('授权信息 cookies', data.authInfo)
-      }
+        data.logs?.push('授权信息 cookies', data.authInfo)
+      },
+      logs: data.logs
     })
 
     await runTask({
@@ -82,15 +86,17 @@ async function authTiktok(): Promise<PlatformResult> {
 
         // TODO 获取头像
 
-        console.log('用户信息', data)
-      }
+        data.logs?.push('用户信息', JSON.stringify(data))
+      },
+      logs: data.logs
     })
 
     await runTask({
       name: '关闭浏览器',
       task: async () => {
         await browser.close()
-      }
+      },
+      logs: data.logs
     })
 
     return {
@@ -102,11 +108,11 @@ async function authTiktok(): Promise<PlatformResult> {
     // 关闭弹窗
     await browser.close()
 
-    console.error('授权过程发生错误:', error)
+    data.logs?.push(`授权过程发生错误: ${error}`)
 
     return {
       success: false,
-      data: undefined,
+      data: data as PlatformResult['data'],
       message: `授权过程发生错误: ${error}`
     }
   }
