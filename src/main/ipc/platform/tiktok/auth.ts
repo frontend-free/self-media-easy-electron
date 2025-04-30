@@ -1,11 +1,11 @@
 import { chromium } from 'playwright'
-import { EnumPlatform, type PlatformResult } from '../types'
+import { EnumPlatform, type PlatformAuthResult } from '../types'
 import { runTask } from '../helper'
 
 const HOME = 'https://creator.douyin.com/creator-micro/home'
 
-async function authTiktok(): Promise<PlatformResult> {
-  const data: Partial<PlatformResult['data']> = {
+async function authTiktok(): Promise<PlatformAuthResult> {
+  const data: Partial<PlatformAuthResult['data']> = {
     platform: EnumPlatform.TIKTOK,
     platformName: undefined,
     platformAvatar: undefined,
@@ -19,12 +19,12 @@ async function authTiktok(): Promise<PlatformResult> {
     headless: false
   })
 
-  // 创建一个干净的上下文
-  const context = await browser.newContext()
-  // 创建页面
-  const page = await context.newPage()
-
   try {
+    // 创建一个干净的上下文
+    const context = await browser.newContext()
+    // 创建页面
+    const page = await context.newPage()
+
     await runTask({
       name: '打开抖音创作者平台登录页面',
       task: async () => {
@@ -36,18 +36,19 @@ async function authTiktok(): Promise<PlatformResult> {
 
     await runTask({
       name: '等待用户抖音扫码授权',
+      logs: data.logs,
       task: async () => {
         // 重新进入个人首页，代表已经登录了。
         await page.waitForURL(HOME, {
           // 5分钟超时
           timeout: 5 * 60 * 1000
         })
-      },
-      logs: data.logs
+      }
     })
 
     await runTask({
       name: '获取授权信息 cookies',
+      logs: data.logs,
       task: async () => {
         // 获取所有 cookies
         const cookies = await context.cookies()
@@ -56,12 +57,12 @@ async function authTiktok(): Promise<PlatformResult> {
         data.authInfo = JSON.stringify(cookies)
 
         data.logs?.push('授权信息 cookies', data.authInfo)
-      },
-      logs: data.logs
+      }
     })
 
     await runTask({
       name: '获取用户信息',
+      logs: data.logs,
       task: async () => {
         // 等待页面加载完成
         await page.waitForTimeout(1000)
@@ -87,21 +88,20 @@ async function authTiktok(): Promise<PlatformResult> {
         // TODO 获取头像
 
         data.logs?.push('用户信息', JSON.stringify(data))
-      },
-      logs: data.logs
+      }
     })
 
     await runTask({
       name: '关闭浏览器',
+      logs: data.logs,
       task: async () => {
         await browser.close()
-      },
-      logs: data.logs
+      }
     })
 
     return {
       success: true,
-      data: data as PlatformResult['data'],
+      data: data as PlatformAuthResult['data'],
       message: '授权成功'
     }
   } catch (error) {
@@ -112,7 +112,7 @@ async function authTiktok(): Promise<PlatformResult> {
 
     return {
       success: false,
-      data: data as PlatformResult['data'],
+      data: data as PlatformAuthResult['data'],
       message: `授权过程发生错误: ${error}`
     }
   }
