@@ -22,11 +22,9 @@ interface PlatformPublishParams {
 }
 
 enum EnumPlatformPublishCode {
-  ERROR_AUTH_INFO_INVALID = 'ERROR_AUTH_INFO_INVALID',
-  ERROR_UPLOAD_FAILED = 'ERROR_UPLOAD_FAILED',
-  ERROR_PUBLISH_FAILED = 'ERROR_PUBLISH_FAILED',
-  ERROR_UNKNOWN = 'ERROR_UNKNOWN'
+  ERROR_AUTH_INFO_INVALID = 'ERROR_AUTH_INFO_INVALID'
 }
+
 interface PlatformPublishResult {
   success: boolean
   data?: {
