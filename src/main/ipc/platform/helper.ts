@@ -16,9 +16,9 @@ async function runTask({
   log(`[开始] ${name}`, logs)
   try {
     await task()
-    log(`[成功] ${name}`, logs)
+    log(`[成功☑️] ${name}`, logs)
   } catch (error) {
-    log(`[失败] ${name}`, logs)
+    log(`[失败❌] ${name}`, logs)
     // 抛到外面
     throw error
   }

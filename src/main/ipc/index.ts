@@ -41,6 +41,8 @@ async function handlePlatformPublish(
   _,
   arg?: PlatformPublishParams
 ): Promise<PlatformPublishResult> {
+  console.log('handlePlatformPublish', arg)
+
   if (!arg || !arg.platform || !arg.authInfo || !arg.resourceOfVideo) {
     return {
       success: false,
