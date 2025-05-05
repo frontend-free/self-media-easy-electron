@@ -92,7 +92,10 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       logs: data.logs,
       task: async () => {
         await page.waitForTimeout(1000)
-        await page.waitForSelector('[class^="player-video-"]')
+        await page.waitForSelector('[class^="player-video-"]', {
+          // 涉及上传，可能需要较长时间
+          timeout: 10 * 60 * 1000
+        })
       }
     })
 
