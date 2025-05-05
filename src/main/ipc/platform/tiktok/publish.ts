@@ -134,7 +134,8 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
     const message = `发布视频过程中发生错误: ${error}`
     data.logs?.push(message)
 
-    if (error === EnumPlatformPublishCode.ERROR_AUTH_INFO_INVALID) {
+    // 暂时这么处理
+    if (`${error}`.includes(EnumPlatformPublishCode.ERROR_AUTH_INFO_INVALID)) {
       data.code = EnumPlatformPublishCode.ERROR_AUTH_INFO_INVALID
     }
 
