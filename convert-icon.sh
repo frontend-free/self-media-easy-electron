@@ -25,7 +25,7 @@ sips -z 512 512   "$SOURCE_IMAGE" --out icon.iconset/icon_512x512.png
 sips -z 1024 1024 "$SOURCE_IMAGE" --out icon.iconset/icon_512x512@2x.png
 
 # 转换为 icns 文件
-iconutil -c icns icon.iconset -o resources/icon.icns
+iconutil -c icns icon.iconset -o build/icon.icns
 
 # 清理临时文件
 rm -rf icon.iconset
