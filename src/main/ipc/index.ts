@@ -1,4 +1,4 @@
-import { ipcMain, dialog } from 'electron'
+import { ipcMain, dialog, app } from 'electron'
 
 import { authTiktok } from './platform/tiktok/auth'
 import { publishTiktok } from './platform/tiktok/publish'
@@ -82,9 +82,16 @@ async function handleShowOpenDialogOfOpenFile(): Promise<ShowOpenDialogOfOpenFil
   }
 }
 
+function handleGetVersion(): string {
+  return app.getVersion()
+}
+
 function initIpc(): void {
   // test
   ipcMain.handle('ping', handlePing)
+
+  // 获取版本号
+  ipcMain.handle('getVersion', handleGetVersion)
 
   ipcMain.handle('platformAuth', handlePlatformAuth)
 
