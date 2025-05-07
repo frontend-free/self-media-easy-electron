@@ -2,6 +2,12 @@
   "name": "subject-media-electron",
   "version": "1.0.0",
   "description": "An Electron application with React and TypeScript",
+  "build": {
+    "publish": {
+      "provider": "generic",
+      "url": "http://110.41.47.50:3000/auto-updates"
+    }
+  },
   "main": "./out/main/index.js",
   "author": "example.com",
   "homepage": "https://electron-vite.org",
@@ -45,6 +51,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "prettier": "^3.5.3",
+    "prettier-plugin-organize-imports": "^4.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "typescript": "^5.8.3",
