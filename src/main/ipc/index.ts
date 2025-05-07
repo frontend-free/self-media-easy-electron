@@ -1,5 +1,4 @@
 import { app, dialog, ipcMain } from 'electron';
-import { autoUpdater } from 'electron-updater';
 import { authTiktok } from './platform/tiktok/auth';
 import { publishTiktok } from './platform/tiktok/publish';
 import {
@@ -86,18 +85,12 @@ function handleGetVersion(): string {
   return app.getVersion();
 }
 
-async function handleCheckForUpdatesAndNotify(): Promise<void> {
-  await autoUpdater.checkForUpdatesAndNotify();
-}
-
 function initIpc(): void {
   // test
   ipcMain.handle('ping', handlePing);
 
   // 获取版本号
   ipcMain.handle('getVersion', handleGetVersion);
-
-  ipcMain.handle('checkForUpdatesAndNotify', handleCheckForUpdatesAndNotify);
 
   ipcMain.handle('platformAuth', handlePlatformAuth);
 
