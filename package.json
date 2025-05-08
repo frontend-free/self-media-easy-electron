@@ -54,8 +54,7 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "electron",
-      "esbuild",
-      "playwright"
+      "esbuild"
     ]
   }
 }
