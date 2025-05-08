@@ -1,9 +1,9 @@
 {
   "name": "subject-media-electron",
   "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "驾K先锋-多媒体工具",
   "main": "./out/main/index.js",
-  "author": "example.com",
+  "author": "驾K先锋",
   "homepage": "https://electron-vite.org",
   "scripts": {
     "format": "prettier --write .",

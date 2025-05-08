@@ -7,7 +7,7 @@ pnpm i
 pnpm dev
 ```
 
-### 部署
+### 打包
 
 ```bash
 pnpm build:win
