@@ -1,4 +1,7 @@
 import { app, dialog, ipcMain } from 'electron';
+import fse from 'fs-extra';
+import { chromium } from 'playwright-core';
+import { installBrowsersForNpmInstall } from 'playwright-core/lib/server';
 import { authTiktok } from './platform/tiktok/auth';
 import { publishTiktok } from './platform/tiktok/publish';
 import {
@@ -85,6 +88,26 @@ function handleGetVersion(): string {
   return app.getVersion();
 }
 
+async function handleCheckPlaywrightBrowser(): Promise<void> {
+  const res = chromium.executablePath();
+
+  // 检查 res 路径是否存在
+  if (res) {
+    if (fse.existsSync(res)) {
+      return;
+    }
+  }
+
+  throw new Error('Playwright Chromium 没有安装');
+}
+
+async function handleInstallPlaywrightBrowser(): Promise<void> {
+  // 使用 Playwright 的 API 安装浏览器
+  await installBrowsersForNpmInstall(['chromium', 'chromium-headless-shell', 'ffmpeg']);
+
+  console.log('Playwright Chromium 安装成功');
+}
+
 function initIpc(): void {
   // test
   ipcMain.handle('ping', handlePing);
@@ -97,6 +120,9 @@ function initIpc(): void {
   ipcMain.handle('platformPublish', handlePlatformPublish);
 
   ipcMain.handle('showOpenDialogOfOpenFile', handleShowOpenDialogOfOpenFile);
+
+  ipcMain.handle('checkPlaywrightBrowser', handleCheckPlaywrightBrowser);
+  ipcMain.handle('installPlaywrightBrowser', handleInstallPlaywrightBrowser);
 }
 
 export { initIpc };

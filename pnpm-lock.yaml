@@ -29,6 +29,9 @@ importers:
       playwright:
         specifier: ^1.52.0
         version: 1.52.0
+      playwright-core:
+        specifier: ^1.52.0
+        version: 1.52.0
     devDependencies:
       '@electron-toolkit/eslint-config-prettier':
         specifier: ^3.0.0
