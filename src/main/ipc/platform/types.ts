@@ -2,6 +2,13 @@ enum EnumPlatform {
   TIKTOK = 'TIKTOK',
 }
 
+enum EnumPublishType {
+  // 正式
+  OFFICIAL = 'OFFICIAL',
+  // 草稿
+  DRAFT = 'DRAFT',
+}
+
 interface PlatformAuthResult {
   success: boolean;
   data?: {
@@ -19,6 +26,9 @@ interface PlatformPublishParams {
   platform: EnumPlatform;
   authInfo: string;
   resourceOfVideo: string;
+  title?: string;
+  description?: string;
+  publishType?: EnumPublishType;
 }
 
 enum EnumPlatformPublishCode {
