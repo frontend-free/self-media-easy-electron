@@ -100,6 +100,14 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
     });
 
     await runTask({
+      name: '填写标题',
+      logs: data.logs,
+      task: async () => {
+        await page.fill('input[class^="semi-input"]', params.title || '');
+      },
+    });
+
+    await runTask({
       name: '点击发布按钮',
       logs: data.logs,
       task: async () => {
