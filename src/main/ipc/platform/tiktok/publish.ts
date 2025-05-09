@@ -16,7 +16,7 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
   };
 
   const browser = await chromium.launch({
-    headless: true, // 显示浏览器窗口
+    headless: process.env.NODE_ENV === 'production' ? true : false, // 显示浏览器窗口
   });
 
   try {
