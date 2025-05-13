@@ -65,24 +65,29 @@ async function authTiktok(): Promise<PlatformAuthResult> {
       logs: data.logs,
       task: async () => {
         // 等待页面加载完成
-        await page.waitForTimeout(1000);
+        await page.waitForTimeout(2000);
 
         // 获取名字
         const nameElement = await page.waitForSelector('[class^="header-"] [class^="name-"]', {
-          timeout: 500,
+          timeout: 5000,
         });
+
         if (nameElement) {
+          data.logs?.push('获取到 nameElement');
           const name = await nameElement.textContent();
           data.platformName = name ?? undefined;
+          data.logs?.push(`获取到 name: ${name}`);
         }
 
         // 获取平台ID
         const platformIdElement = await page.waitForSelector('[class^="unique_id-"]', {
-          timeout: 500,
+          timeout: 5000,
         });
         if (platformIdElement) {
+          data.logs?.push('获取到 platformIdElement');
           const platformId = await platformIdElement.textContent();
           data.platformId = platformId ? platformId.match(/\d+/)?.[0] : undefined;
+          data.logs?.push(`获取到 platformId: ${data.platformId}`);
         }
 
         // TODO 获取头像
