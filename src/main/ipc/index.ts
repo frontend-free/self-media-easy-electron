@@ -3,9 +3,12 @@ import fse from 'fs-extra';
 import { chromium } from 'playwright-core';
 import { installBrowsersForNpmInstall } from 'playwright-core/lib/server';
 import { authTiktok } from './platform/tiktok/auth';
+import { authCheckTiktok } from './platform/tiktok/auth_check';
 import { publishTiktok } from './platform/tiktok/publish';
 import {
   EnumPlatform,
+  PlatformAuthCheckParams,
+  PlatformAuthCheckResult,
   PlatformAuthResult,
   PlatformPublishParams,
   PlatformPublishResult,
@@ -22,7 +25,7 @@ async function handlePlatformAuth(_, arg?: { platform: string }): Promise<Platfo
   if (!arg || !arg.platform) {
     return {
       success: false,
-      message: '平台不能为空',
+      message: '参数错误，请检查',
     };
   }
 
@@ -31,6 +34,32 @@ async function handlePlatformAuth(_, arg?: { platform: string }): Promise<Platfo
   switch (platform) {
     case EnumPlatform.TIKTOK:
       return await authTiktok();
+    default:
+      return {
+        success: false,
+        message: `平台不支持 ${platform}`,
+      };
+  }
+}
+
+async function handlePlatformAuthCheck(
+  _,
+  arg?: PlatformAuthCheckParams,
+): Promise<PlatformAuthCheckResult> {
+  console.log('handlePlatformAuthCheck', arg);
+
+  if (!arg || !arg.platform || !arg.authInfo) {
+    return {
+      success: false,
+      message: '参数错误，请检查',
+    };
+  }
+
+  const { platform } = arg;
+
+  switch (platform) {
+    case EnumPlatform.TIKTOK:
+      return await authCheckTiktok(arg);
     default:
       return {
         success: false,
@@ -116,7 +145,7 @@ function initIpc(): void {
   ipcMain.handle('getVersion', handleGetVersion);
 
   ipcMain.handle('platformAuth', handlePlatformAuth);
-
+  ipcMain.handle('platformAuthCheck', handlePlatformAuthCheck);
   ipcMain.handle('platformPublish', handlePlatformPublish);
 
   ipcMain.handle('showOpenDialogOfOpenFile', handleShowOpenDialogOfOpenFile);

@@ -8,7 +8,7 @@ import {
 } from '../types';
 
 async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPublishResult> {
-  const { resourceOfVideo, authInfo } = params;
+  const { title, resourceOfVideo, authInfo } = params;
 
   const data: Partial<PlatformPublishResult['data']> = {
     platform: EnumPlatform.TIKTOK,
@@ -48,23 +48,22 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       logs: data.logs,
       task: async () => {
         // 等待
-        await page.waitForTimeout(1000);
+        await page.waitForTimeout(2000);
 
         // 等待结果
         await Promise.race([
           // 如果还在当前页，则认为登录
-          page.waitForURL('https://creator.douyin.com/creator-micro/content/upload'),
+          page.waitForURL('https://creator.douyin.com/creator-micro/content/upload').then(() => {
+            data.logs?.push('授权信息有效');
+          }),
           // 如果跳转到了登录页，则认为授权信息失效
           page.waitForURL('https://creator.douyin.com/').then(() => {
+            data.logs?.push('授权信息失效');
             throw new Error(EnumPlatformPublishCode.ERROR_AUTH_INFO_INVALID);
           }),
         ]);
       },
     });
-
-    // console.log('等待页面加载完成')
-    // await page.waitForLoadState('load')
-    // console.log('页面加载完成')
 
     let uploadButton;
 
@@ -103,7 +102,7 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       name: '填写标题',
       logs: data.logs,
       task: async () => {
-        await page.fill('input[class^="semi-input"]', params.title || '');
+        await page.fill('input[class^="semi-input"]', title || '');
       },
     });
 

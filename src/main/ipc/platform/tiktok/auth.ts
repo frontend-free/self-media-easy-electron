@@ -2,8 +2,6 @@ import { chromium } from 'playwright';
 import { runTask } from '../helper';
 import { EnumPlatform, type PlatformAuthResult } from '../types';
 
-const HOME = 'https://creator.douyin.com/creator-micro/home';
-
 async function authTiktok(): Promise<PlatformAuthResult> {
   const data: Partial<PlatformAuthResult['data']> = {
     platform: EnumPlatform.TIKTOK,
@@ -29,7 +27,7 @@ async function authTiktok(): Promise<PlatformAuthResult> {
       name: '打开抖音创作者平台登录页面',
       task: async () => {
         // 未登录会调整到扫码页面 creator.douyin.com
-        await page.goto(HOME);
+        await page.goto('https://creator.douyin.com/creator-micro/home');
       },
       logs: data.logs,
     });
@@ -39,7 +37,7 @@ async function authTiktok(): Promise<PlatformAuthResult> {
       logs: data.logs,
       task: async () => {
         // 重新进入个人首页，代表已经登录了。
-        await page.waitForURL(HOME, {
+        await page.waitForURL('https://creator.douyin.com/creator-micro/home', {
           // 5分钟超时
           timeout: 5 * 60 * 1000,
         });

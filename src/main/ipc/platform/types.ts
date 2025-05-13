@@ -45,6 +45,19 @@ interface PlatformPublishResult {
   message?: string;
 }
 
+interface PlatformAuthCheckParams {
+  platform: EnumPlatform;
+  authInfo: string;
+}
+interface PlatformAuthCheckResult {
+  success: boolean;
+  data?: {
+    platform: EnumPlatform;
+    logs?: string[];
+  };
+  message?: string;
+}
+
 interface ShowOpenDialogOfOpenFileResult {
   success: boolean;
   data?: {
@@ -55,6 +68,8 @@ interface ShowOpenDialogOfOpenFileResult {
 
 export { EnumPlatform, EnumPlatformPublishCode };
 export type {
+  PlatformAuthCheckParams,
+  PlatformAuthCheckResult,
   PlatformAuthResult,
   PlatformPublishParams,
   PlatformPublishResult,
