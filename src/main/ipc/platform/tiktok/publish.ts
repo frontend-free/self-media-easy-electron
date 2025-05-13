@@ -8,7 +8,7 @@ import {
 } from '../types';
 
 async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPublishResult> {
-  const { title, resourceOfVideo, authInfo } = params;
+  const { title, resourceOfVideo, authInfo, isDebug } = params;
 
   const data: Partial<PlatformPublishResult['data']> = {
     platform: EnumPlatform.TIKTOK,
@@ -16,7 +16,7 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
   };
 
   const browser = await chromium.launch({
-    headless: process.env.NODE_ENV === 'production' ? true : false, // 显示浏览器窗口
+    headless: false,
   });
 
   try {
@@ -125,13 +125,15 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       },
     });
 
-    await runTask({
-      name: '关闭浏览器',
-      logs: data.logs,
-      task: async () => {
-        await browser.close();
-      },
-    });
+    if (!isDebug) {
+      await runTask({
+        name: '关闭浏览器',
+        logs: data.logs,
+        task: async () => {
+          await browser.close();
+        },
+      });
+    }
 
     return {
       success: true,
@@ -139,7 +141,10 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       message: '发布成功',
     };
   } catch (error) {
-    await browser.close();
+    if (!isDebug) {
+      // 关闭弹窗
+      await browser.close();
+    }
 
     const message = `发布视频过程中发生错误: ${error}`;
     data.logs?.push(message);

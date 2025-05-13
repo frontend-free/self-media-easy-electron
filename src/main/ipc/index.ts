@@ -9,6 +9,7 @@ import {
   EnumPlatform,
   PlatformAuthCheckParams,
   PlatformAuthCheckResult,
+  PlatformAuthParams,
   PlatformAuthResult,
   PlatformPublishParams,
   PlatformPublishResult,
@@ -19,7 +20,7 @@ function handlePing(): string {
   return 'pong';
 }
 
-async function handlePlatformAuth(_, arg?: { platform: string }): Promise<PlatformAuthResult> {
+async function handlePlatformAuth(_, arg?: PlatformAuthParams): Promise<PlatformAuthResult> {
   console.log('handlePlatformAuth', arg);
 
   if (!arg || !arg.platform) {

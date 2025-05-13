@@ -3,7 +3,7 @@ import { runTask } from '../helper';
 import { EnumPlatform, PlatformAuthCheckParams, PlatformAuthCheckResult } from '../types';
 
 async function authCheckTiktok(params: PlatformAuthCheckParams): Promise<PlatformAuthCheckResult> {
-  const { authInfo } = params;
+  const { authInfo, isDebug } = params;
 
   const data: Partial<PlatformAuthCheckResult['data']> = {
     platform: EnumPlatform.TIKTOK,
@@ -62,13 +62,15 @@ async function authCheckTiktok(params: PlatformAuthCheckParams): Promise<Platfor
       },
     });
 
-    await runTask({
-      name: '关闭浏览器',
-      logs: data.logs,
-      task: async () => {
-        await browser.close();
-      },
-    });
+    if (!isDebug) {
+      await runTask({
+        name: '关闭浏览器',
+        logs: data.logs,
+        task: async () => {
+          await browser.close();
+        },
+      });
+    }
 
     return {
       success,
@@ -76,8 +78,10 @@ async function authCheckTiktok(params: PlatformAuthCheckParams): Promise<Platfor
       message: '授权检查成功',
     };
   } catch (error) {
-    // 关闭弹窗
-    await browser.close();
+    if (!isDebug) {
+      // 关闭弹窗
+      await browser.close();
+    }
 
     data.logs?.push(`授权检查过程发生错误: ${error}`);
 

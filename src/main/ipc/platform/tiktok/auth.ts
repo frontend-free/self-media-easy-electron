@@ -1,8 +1,10 @@
 import { chromium } from 'playwright';
 import { runTask } from '../helper';
-import { EnumPlatform, type PlatformAuthResult } from '../types';
+import { EnumPlatform, PlatformAuthParams, type PlatformAuthResult } from '../types';
 
-async function authTiktok(): Promise<PlatformAuthResult> {
+async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResult> {
+  const { isDebug } = params;
+
   const data: Partial<PlatformAuthResult['data']> = {
     platform: EnumPlatform.TIKTOK,
     platformName: undefined,
@@ -94,13 +96,15 @@ async function authTiktok(): Promise<PlatformAuthResult> {
       },
     });
 
-    await runTask({
-      name: '关闭浏览器',
-      logs: data.logs,
-      task: async () => {
-        await browser.close();
-      },
-    });
+    if (!isDebug) {
+      await runTask({
+        name: '关闭浏览器',
+        logs: data.logs,
+        task: async () => {
+          await browser.close();
+        },
+      });
+    }
 
     return {
       success: true,
@@ -108,8 +112,10 @@ async function authTiktok(): Promise<PlatformAuthResult> {
       message: '授权成功',
     };
   } catch (error) {
-    // 关闭弹窗
-    await browser.close();
+    if (!isDebug) {
+      // 关闭弹窗
+      await browser.close();
+    }
 
     data.logs?.push(`授权过程发生错误: ${error}`);
 

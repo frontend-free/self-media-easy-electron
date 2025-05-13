@@ -9,6 +9,11 @@ enum EnumPublishType {
   DRAFT = 'DRAFT',
 }
 
+interface PlatformAuthParams {
+  platform: EnumPlatform;
+  isDebug?: boolean;
+}
+
 interface PlatformAuthResult {
   success: boolean;
   data?: {
@@ -22,6 +27,20 @@ interface PlatformAuthResult {
   message?: string;
 }
 
+interface PlatformAuthCheckParams {
+  platform: EnumPlatform;
+  authInfo: string;
+  isDebug?: boolean;
+}
+interface PlatformAuthCheckResult {
+  success: boolean;
+  data?: {
+    platform: EnumPlatform;
+    logs?: string[];
+  };
+  message?: string;
+}
+
 interface PlatformPublishParams {
   platform: EnumPlatform;
   authInfo: string;
@@ -29,6 +48,7 @@ interface PlatformPublishParams {
   title?: string;
   description?: string;
   publishType?: EnumPublishType;
+  isDebug?: boolean;
 }
 
 enum EnumPlatformPublishCode {
@@ -40,19 +60,6 @@ interface PlatformPublishResult {
   data?: {
     platform: EnumPlatform;
     code: EnumPlatformPublishCode;
-    logs?: string[];
-  };
-  message?: string;
-}
-
-interface PlatformAuthCheckParams {
-  platform: EnumPlatform;
-  authInfo: string;
-}
-interface PlatformAuthCheckResult {
-  success: boolean;
-  data?: {
-    platform: EnumPlatform;
     logs?: string[];
   };
   message?: string;
@@ -70,6 +77,7 @@ export { EnumPlatform, EnumPlatformPublishCode };
 export type {
   PlatformAuthCheckParams,
   PlatformAuthCheckResult,
+  PlatformAuthParams,
   PlatformAuthResult,
   PlatformPublishParams,
   PlatformPublishResult,
