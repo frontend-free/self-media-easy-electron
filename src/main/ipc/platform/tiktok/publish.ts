@@ -152,7 +152,7 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
     }
 
     // 浏览器被关闭
-    if (`${error}`.includes(EnumCode.ERROR_CLOSED)) {
+    if (`${error}`.includes('closed')) {
       message = '浏览器被关闭';
       data.code = EnumCode.ERROR_CLOSED;
     }
