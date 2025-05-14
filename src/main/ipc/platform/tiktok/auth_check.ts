@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 import { runTask } from '../helper';
-import { EnumPlatform, PlatformAuthCheckParams, PlatformAuthCheckResult } from '../types';
+import { EnumCode, EnumPlatform, PlatformAuthCheckParams, PlatformAuthCheckResult } from '../types';
 
 async function authCheckTiktok(params: PlatformAuthCheckParams): Promise<PlatformAuthCheckResult> {
   const { authInfo, isDebug } = params;
@@ -78,9 +78,16 @@ async function authCheckTiktok(params: PlatformAuthCheckParams): Promise<Platfor
       message: '授权检查成功',
     };
   } catch (error) {
+    console.error(error);
+
     if (!isDebug) {
       // 关闭弹窗
       await browser.close();
+    }
+
+    // 浏览器被关闭
+    if (`${error}`.includes(EnumCode.ERROR_CLOSED)) {
+      data.code = EnumCode.ERROR_CLOSED;
     }
 
     data.logs?.push(`授权检查过程发生错误: ${error}`);

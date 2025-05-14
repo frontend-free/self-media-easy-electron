@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 import { runTask } from '../helper';
-import { EnumPlatform, PlatformAuthParams, type PlatformAuthResult } from '../types';
+import { EnumCode, EnumPlatform, PlatformAuthParams, type PlatformAuthResult } from '../types';
 
 async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResult> {
   const { isDebug } = params;
@@ -112,9 +112,16 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
       message: '授权成功',
     };
   } catch (error) {
+    console.error(error);
+
     if (!isDebug) {
       // 关闭弹窗
       await browser.close();
+    }
+
+    // 浏览器被关闭
+    if (`${error}`.includes(EnumCode.ERROR_CLOSED)) {
+      data.code = EnumCode.ERROR_CLOSED;
     }
 
     data.logs?.push(`授权过程发生错误: ${error}`);

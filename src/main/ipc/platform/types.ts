@@ -9,6 +9,13 @@ enum EnumPublishType {
   DRAFT = 'DRAFT',
 }
 
+enum EnumCode {
+  /** 浏览器被关闭了 */
+  ERROR_CLOSED = 'ERROR_CLOSED',
+  /** 授权信息无效 */
+  ERROR_AUTH_INFO_INVALID = 'ERROR_AUTH_INFO_INVALID',
+}
+
 interface PlatformAuthParams {
   platform: EnumPlatform;
   isDebug?: boolean;
@@ -17,6 +24,7 @@ interface PlatformAuthParams {
 interface PlatformAuthResult {
   success: boolean;
   data?: {
+    code: EnumCode;
     platform: EnumPlatform;
     platformName?: string;
     platformAvatar?: string;
@@ -35,6 +43,7 @@ interface PlatformAuthCheckParams {
 interface PlatformAuthCheckResult {
   success: boolean;
   data?: {
+    code: EnumCode;
     platform: EnumPlatform;
     logs?: string[];
   };
@@ -51,15 +60,11 @@ interface PlatformPublishParams {
   isDebug?: boolean;
 }
 
-enum EnumPlatformPublishCode {
-  ERROR_AUTH_INFO_INVALID = 'ERROR_AUTH_INFO_INVALID',
-}
-
 interface PlatformPublishResult {
   success: boolean;
   data?: {
+    code: EnumCode;
     platform: EnumPlatform;
-    code: EnumPlatformPublishCode;
     logs?: string[];
   };
   message?: string;
@@ -73,7 +78,7 @@ interface ShowOpenDialogOfOpenFileResult {
   message?: string;
 }
 
-export { EnumPlatform, EnumPlatformPublishCode };
+export { EnumCode, EnumPlatform };
 export type {
   PlatformAuthCheckParams,
   PlatformAuthCheckResult,

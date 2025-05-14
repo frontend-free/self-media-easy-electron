@@ -1,11 +1,6 @@
 import { chromium } from 'playwright';
 import { runTask } from '../helper';
-import {
-  EnumPlatform,
-  EnumPlatformPublishCode,
-  PlatformPublishParams,
-  PlatformPublishResult,
-} from '../types';
+import { EnumCode, EnumPlatform, PlatformPublishParams, PlatformPublishResult } from '../types';
 
 async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPublishResult> {
   const { title, resourceOfVideo, authInfo, isDebug } = params;
@@ -59,7 +54,7 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
           // 如果跳转到了登录页，则认为授权信息失效
           page.waitForURL('https://creator.douyin.com/').then(() => {
             data.logs?.push('授权信息失效');
-            throw new Error(EnumPlatformPublishCode.ERROR_AUTH_INFO_INVALID);
+            throw new Error(EnumCode.ERROR_AUTH_INFO_INVALID);
           }),
         ]);
       },
@@ -141,23 +136,29 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       message: '发布成功',
     };
   } catch (error) {
+    console.error(error);
+
     if (!isDebug) {
       // 关闭弹窗
       await browser.close();
     }
 
-    const message = `发布视频过程中发生错误: ${error}`;
-    data.logs?.push(message);
-
-    // 暂时这么处理
-    if (`${error}`.includes(EnumPlatformPublishCode.ERROR_AUTH_INFO_INVALID)) {
-      data.code = EnumPlatformPublishCode.ERROR_AUTH_INFO_INVALID;
+    // 授权失效
+    if (`${error}`.includes(EnumCode.ERROR_AUTH_INFO_INVALID)) {
+      data.code = EnumCode.ERROR_AUTH_INFO_INVALID;
     }
+
+    // 浏览器被关闭
+    if (`${error}`.includes(EnumCode.ERROR_CLOSED)) {
+      data.code = EnumCode.ERROR_CLOSED;
+    }
+
+    data.logs?.push(`发布视频过程中发生错误: ${error}`);
 
     return {
       success: false,
       data: data as PlatformPublishResult['data'],
-      message,
+      message: `发布视频过程中发生错误: ${error}`,
     };
   }
 }
