@@ -143,22 +143,26 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       await browser.close();
     }
 
+    let message = `发布视频过程中发生错误: ${error}`;
+
     // 授权失效
     if (`${error}`.includes(EnumCode.ERROR_AUTH_INFO_INVALID)) {
+      message = '授权信息无效';
       data.code = EnumCode.ERROR_AUTH_INFO_INVALID;
     }
 
     // 浏览器被关闭
     if (`${error}`.includes(EnumCode.ERROR_CLOSED)) {
+      message = '浏览器被关闭';
       data.code = EnumCode.ERROR_CLOSED;
     }
 
-    data.logs?.push(`发布视频过程中发生错误: ${error}`);
+    data.logs?.push(message);
 
     return {
       success: false,
       data: data as PlatformPublishResult['data'],
-      message: `发布视频过程中发生错误: ${error}`,
+      message,
     };
   }
 }

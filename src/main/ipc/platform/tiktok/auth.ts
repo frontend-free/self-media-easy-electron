@@ -119,17 +119,20 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
       await browser.close();
     }
 
+    let message = `授权过程发生错误: ${error}`;
+
     // 浏览器被关闭
     if (`${error}`.includes(EnumCode.ERROR_CLOSED)) {
+      message = '浏览器被关闭';
       data.code = EnumCode.ERROR_CLOSED;
     }
 
-    data.logs?.push(`授权过程发生错误: ${error}`);
+    data.logs?.push(message);
 
     return {
       success: false,
       data: data as PlatformAuthResult['data'],
-      message: `授权过程发生错误: ${error}`,
+      message,
     };
   }
 }
