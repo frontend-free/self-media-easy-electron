@@ -34,7 +34,7 @@ async function handlePlatformAuth(_, arg?: PlatformAuthParams): Promise<Platform
 
   switch (platform) {
     case EnumPlatform.TIKTOK:
-      return await authTiktok();
+      return await authTiktok(arg);
     default:
       return {
         success: false,
