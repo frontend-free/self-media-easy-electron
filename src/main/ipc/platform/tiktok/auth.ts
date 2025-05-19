@@ -17,6 +17,7 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
   // 显示浏览器窗口
   const browser = await chromium.launch({
     headless: false,
+    channel: 'chrome',
   });
 
   try {

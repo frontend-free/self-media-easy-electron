@@ -12,6 +12,7 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
 
   const browser = await chromium.launch({
     headless: false,
+    channel: 'chrome',
   });
 
   try {
