@@ -15,7 +15,9 @@ import {
   PlatformPublishResult,
   ShowOpenDialogOfOpenFileResult,
 } from './platform/types';
-
+import { authWeixinVideo } from './platform/weixin_video/auth';
+import { authCheckWeixinVideo } from './platform/weixin_video/auth_check';
+import { publishWeixinVideo } from './platform/weixin_video/publish';
 function handlePing(): string {
   return 'pong';
 }
@@ -35,6 +37,8 @@ async function handlePlatformAuth(_, arg?: PlatformAuthParams): Promise<Platform
   switch (platform) {
     case EnumPlatform.TIKTOK:
       return await authTiktok(arg);
+    case EnumPlatform.WEIXIN_VIDEO:
+      return await authWeixinVideo(arg);
     default:
       return {
         success: false,
@@ -61,6 +65,8 @@ async function handlePlatformAuthCheck(
   switch (platform) {
     case EnumPlatform.TIKTOK:
       return await authCheckTiktok(arg);
+    case EnumPlatform.WEIXIN_VIDEO:
+      return await authCheckWeixinVideo(arg);
     default:
       return {
         success: false,
@@ -87,6 +93,8 @@ async function handlePlatformPublish(
   switch (platform) {
     case EnumPlatform.TIKTOK:
       return await publishTiktok(arg);
+    case EnumPlatform.WEIXIN_VIDEO:
+      return await publishWeixinVideo(arg);
     default:
       return {
         success: false,

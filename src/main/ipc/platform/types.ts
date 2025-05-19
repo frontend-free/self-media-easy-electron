@@ -1,5 +1,6 @@
 enum EnumPlatform {
   TIKTOK = 'TIKTOK',
+  WEIXIN_VIDEO = 'WEIXIN_VIDEO',
 }
 
 enum EnumPublishType {

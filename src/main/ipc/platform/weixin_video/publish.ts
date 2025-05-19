@@ -2,11 +2,11 @@ import { chromium } from 'playwright';
 import { runTask } from '../helper';
 import { EnumCode, EnumPlatform, PlatformPublishParams, PlatformPublishResult } from '../types';
 
-async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPublishResult> {
+async function publishWeixinVideo(params: PlatformPublishParams): Promise<PlatformPublishResult> {
   const { title, resourceOfVideo, authInfo, isDebug } = params;
 
   const data: Partial<PlatformPublishResult['data']> = {
-    platform: EnumPlatform.TIKTOK,
+    platform: EnumPlatform.WEIXIN_VIDEO,
     logs: [],
   };
 
@@ -31,10 +31,10 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
     const page = await context.newPage();
 
     await runTask({
-      name: '打开抖音创作者平台上传页面',
+      name: '打开视频号助手上传页面',
       logs: data.logs,
       task: async () => {
-        await page.goto('https://creator.douyin.com/creator-micro/content/upload');
+        await page.goto('https://channels.weixin.qq.com/platform/post/create');
       },
     });
 
@@ -48,11 +48,11 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
         // 等待结果
         await Promise.race([
           // 如果还在当前页，则认为登录
-          page.waitForURL('https://creator.douyin.com/creator-micro/content/upload').then(() => {
+          page.waitForURL('https://channels.weixin.qq.com/platform/post/create').then(() => {
             data.logs?.push('授权信息有效');
           }),
           // 如果跳转到了登录页，则认为授权信息失效
-          page.waitForURL('https://creator.douyin.com/').then(() => {
+          page.waitForURL('https://channels.weixin.qq.com/login.html').then(() => {
             data.logs?.push('授权信息失效');
             throw new Error(EnumCode.ERROR_AUTH_INFO_INVALID);
           }),
@@ -61,15 +61,23 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
     });
 
     let uploadButton;
-
     await runTask({
       name: '等待上传按钮出现',
       logs: data.logs,
       task: async () => {
-        // 等待上传按钮出现
-        const uploadContainer = await page.waitForSelector('[class^="container-drag-"]');
-        // 获取隐藏的input元素
-        uploadButton = await uploadContainer.$('input');
+        uploadButton = page.locator('input[type="file"]');
+        await uploadButton.waitFor({
+          state: 'hidden',
+        });
+      },
+    });
+
+    await runTask({
+      name: '填写标题',
+      logs: data.logs,
+      task: async () => {
+        const titleInput = page.locator('.short-title-wrap input');
+        await titleInput.fill(title || '');
       },
     });
 
@@ -81,66 +89,56 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       },
     });
 
-    await runTask({
-      name: '等待视频上传完成',
-      logs: data.logs,
-      task: async () => {
-        await page.waitForTimeout(2000);
-        await page.waitForSelector('[class^="player-video-"]', {
-          // 涉及上传，可能需要较长时间
-          timeout: 10 * 60 * 1000,
-        });
-      },
-    });
+    // await runTask({
+    //   name: '等待视频上传完成',
+    //   logs: data.logs,
+    //   task: async () => {
+    //     await iframe.waitForTimeout(2000);
+    //     await iframe.waitForSelector('#fullScreenVideo', {
+    //       // 涉及上传，可能需要较长时间
+    //       timeout: 10 * 60 * 1000,
+    //     });
+    //   },
+    // });
 
-    await runTask({
-      name: '填写标题',
-      logs: data.logs,
-      task: async () => {
-        await page.fill('input[class^="semi-input"]', title || '');
-      },
-    });
+    // await runTask({
+    //   name: '点击发布按钮',
+    //   logs: data.logs,
+    //   task: async () => {
+    //     await iframe.waitForTimeout(500);
+    //     await iframe.click('button:text("发表")');
+    //   },
+    // });
 
-    await runTask({
-      name: '点击发布按钮',
-      logs: data.logs,
-      task: async () => {
-        await page.waitForTimeout(500);
-        await page.click('button:text("发布")');
-      },
-    });
-
-    await runTask({
-      name: '等待发布完成',
-      logs: data.logs,
-      task: async () => {
-        await page.waitForURL(
-          'https://creator.douyin.com/creator-micro/content/manage?enter_from=publish',
-        );
-      },
-    });
+    // await runTask({
+    //   name: '等待发布完成',
+    //   logs: data.logs,
+    //   task: async () => {
+    //     await page.waitForURL('https://channels.weixin.qq.com/platform/post/list');
+    //   },
+    // });
 
     if (!isDebug) {
-      await runTask({
-        name: '关闭浏览器',
-        logs: data.logs,
-        task: async () => {
-          await browser.close();
-        },
-      });
+      // await runTask({
+      //   name: '关闭浏览器',
+      //   logs: data.logs,
+      //   task: async () => {
+      //     await browser.close();
+      //   },
+      // });
     }
 
-    return {
-      success: true,
-      data: data as PlatformPublishResult['data'],
-      message: '发布成功',
-    };
+    // return {
+    //   success: true,
+    //   data: data as PlatformPublishResult['data'],
+    //   message: '发布成功',
+    // };
   } catch (error) {
     console.error(error);
 
     if (!isDebug) {
       // 关闭弹窗
-      await browser.close();
+      // await browser.close();
     }
 
     let message = `发布视频过程中发生错误: ${error}`;
@@ -167,4 +165,4 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
   }
 }
 
-export { publishTiktok };
+export { publishWeixinVideo };

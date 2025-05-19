@@ -2,11 +2,11 @@ import { chromium } from 'playwright';
 import { runTask } from '../helper';
 import { EnumCode, EnumPlatform, PlatformAuthParams, type PlatformAuthResult } from '../types';
 
-async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResult> {
+async function authWeixinVideo(params: PlatformAuthParams): Promise<PlatformAuthResult> {
   const { isDebug } = params;
 
   const data: Partial<PlatformAuthResult['data']> = {
-    platform: EnumPlatform.TIKTOK,
+    platform: EnumPlatform.WEIXIN_VIDEO,
     platformName: undefined,
     platformAvatar: undefined,
     platformId: undefined,
@@ -28,7 +28,7 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
     await runTask({
       name: '打开登录页面',
       task: async () => {
-        await page.goto('https://creator.douyin.com/');
+        await page.goto('https://channels.weixin.qq.com/login.html');
       },
       logs: data.logs,
     });
@@ -38,7 +38,7 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
       logs: data.logs,
       task: async () => {
         // 登录进入首页
-        await page.waitForURL('https://creator.douyin.com/creator-micro/home', {
+        await page.waitForURL('https://channels.weixin.qq.com/platform/', {
           // 5分钟超时
           timeout: 5 * 60 * 1000,
         });
@@ -67,7 +67,7 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
         await page.waitForTimeout(3000);
 
         // 获取名字
-        const nameElement = await page.waitForSelector('[class^="header-"] [class^="name-"]', {
+        const nameElement = await page.waitForSelector('.finder-nickname', {
           timeout: 5000,
         });
 
@@ -79,7 +79,7 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
         }
 
         // 获取平台ID
-        const platformIdElement = await page.waitForSelector('[class^="unique_id-"]', {
+        const platformIdElement = await page.waitForSelector('.finder-uniq-id', {
           timeout: 5000,
         });
         if (platformIdElement) {
@@ -136,4 +136,4 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
   }
 }
 
-export { authTiktok };
+export { authWeixinVideo };
