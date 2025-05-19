@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { runTask } from '../helper';
+import { log, runTask } from '../helper';
 import { EnumCode, EnumPlatform, PlatformAuthParams, type PlatformAuthResult } from '../types';
 
 async function authWeixinVideo(params: PlatformAuthParams): Promise<PlatformAuthResult> {
@@ -55,7 +55,7 @@ async function authWeixinVideo(params: PlatformAuthParams): Promise<PlatformAuth
         // 保存 cookies
         data.authInfo = JSON.stringify(cookies);
 
-        data.logs?.push('授权信息 cookies', data.authInfo);
+        log('授权信息 cookies', data.logs);
       },
     });
 
@@ -63,35 +63,25 @@ async function authWeixinVideo(params: PlatformAuthParams): Promise<PlatformAuth
       name: '获取用户信息',
       logs: data.logs,
       task: async () => {
-        // 等待页面加载完成
-        await page.waitForTimeout(3000);
-
         // 获取名字
-        const nameElement = await page.waitForSelector('.finder-nickname', {
-          timeout: 5000,
+        const name = page.locator('.finder-nickname');
+        await name.waitFor({
+          state: 'visible',
         });
-
-        if (nameElement) {
-          data.logs?.push('获取到 nameElement');
-          const name = await nameElement.textContent();
-          data.platformName = name ?? undefined;
-          data.logs?.push(`获取到 name: ${name}`);
-        }
+        const nameText = await name.textContent();
+        data.platformName = nameText ?? undefined;
+        log(`获取到 name: ${nameText}`, data.logs);
 
         // 获取平台ID
-        const platformIdElement = await page.waitForSelector('.finder-uniq-id', {
-          timeout: 5000,
+        const platformId = page.locator('.finder-uniq-id');
+        await platformId.waitFor({
+          state: 'visible',
         });
-        if (platformIdElement) {
-          data.logs?.push('获取到 platformIdElement');
-          const platformId = await platformIdElement.textContent();
-          data.platformId = platformId ? platformId.match(/\d+/)?.[0] : undefined;
-          data.logs?.push(`获取到 platformId: ${data.platformId}`);
-        }
+        const platformIdText = await platformId.textContent();
+        data.platformId = platformIdText ?? undefined;
+        log(`获取到 platformId: ${data.platformId}`, data.logs);
 
-        // TODO 获取头像
-
-        data.logs?.push('用户信息', JSON.stringify(data));
+        log(`用户信息: ${JSON.stringify(data)}`, data.logs);
       },
     });
 
@@ -126,7 +116,7 @@ async function authWeixinVideo(params: PlatformAuthParams): Promise<PlatformAuth
       data.code = EnumCode.ERROR_CLOSED;
     }
 
-    data.logs?.push(message);
+    log(message, data.logs);
 
     return {
       success: false,

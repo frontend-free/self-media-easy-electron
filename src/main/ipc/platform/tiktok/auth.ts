@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { runTask } from '../helper';
+import { log, runTask } from '../helper';
 import { EnumCode, EnumPlatform, PlatformAuthParams, type PlatformAuthResult } from '../types';
 
 async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResult> {
@@ -55,7 +55,7 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
         // 保存 cookies
         data.authInfo = JSON.stringify(cookies);
 
-        data.logs?.push('授权信息 cookies', data.authInfo);
+        log('授权信息 cookies', data.logs);
       },
     });
 
@@ -72,10 +72,10 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
         });
 
         if (nameElement) {
-          data.logs?.push('获取到 nameElement');
+          log('获取到 nameElement', data.logs);
           const name = await nameElement.textContent();
           data.platformName = name ?? undefined;
-          data.logs?.push(`获取到 name: ${name}`);
+          log(`获取到 name: ${name}`, data.logs);
         }
 
         // 获取平台ID
@@ -83,15 +83,13 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
           timeout: 5000,
         });
         if (platformIdElement) {
-          data.logs?.push('获取到 platformIdElement');
+          log('获取到 platformIdElement', data.logs);
           const platformId = await platformIdElement.textContent();
           data.platformId = platformId ? platformId.match(/\d+/)?.[0] : undefined;
-          data.logs?.push(`获取到 platformId: ${data.platformId}`);
+          log(`获取到 platformId: ${data.platformId}`, data.logs);
         }
 
-        // TODO 获取头像
-
-        data.logs?.push('用户信息', JSON.stringify(data));
+        log(`用户信息: ${JSON.stringify(data)}`, data.logs);
       },
     });
 
@@ -126,7 +124,7 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
       data.code = EnumCode.ERROR_CLOSED;
     }
 
-    data.logs?.push(message);
+    log(message, data.logs);
 
     return {
       success: false,

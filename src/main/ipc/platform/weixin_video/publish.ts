@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { runTask } from '../helper';
+import { log, runTask } from '../helper';
 import { EnumCode, EnumPlatform, PlatformPublishParams, PlatformPublishResult } from '../types';
 
 async function publishWeixinVideo(params: PlatformPublishParams): Promise<PlatformPublishResult> {
@@ -12,6 +12,8 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
 
   const browser = await chromium.launch({
     headless: false,
+    // 视频号需要使用 chrome，否则无法识别视频。 更多见 https://sap-doc.nasdaddy.com/docs/tutorial-basics/platform-channels/
+    channel: 'chrome',
   });
 
   try {
@@ -49,11 +51,11 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
         await Promise.race([
           // 如果还在当前页，则认为登录
           page.waitForURL('https://channels.weixin.qq.com/platform/post/create').then(() => {
-            data.logs?.push('授权信息有效');
+            log('授权信息有效', data.logs);
           }),
           // 如果跳转到了登录页，则认为授权信息失效
           page.waitForURL('https://channels.weixin.qq.com/login.html').then(() => {
-            data.logs?.push('授权信息失效');
+            log('授权信息失效', data.logs);
             throw new Error(EnumCode.ERROR_AUTH_INFO_INVALID);
           }),
         ]);
@@ -89,56 +91,58 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
       },
     });
 
-    // await runTask({
-    //   name: '等待视频上传完成',
-    //   logs: data.logs,
-    //   task: async () => {
-    //     await iframe.waitForTimeout(2000);
-    //     await iframe.waitForSelector('#fullScreenVideo', {
-    //       // 涉及上传，可能需要较长时间
-    //       timeout: 10 * 60 * 1000,
-    //     });
-    //   },
-    // });
+    await runTask({
+      name: '等待视频上传完成',
+      logs: data.logs,
+      task: async () => {
+        const video = page.locator('#fullScreenVideo');
+        await video.waitFor({
+          state: 'visible',
+        });
+      },
+    });
 
-    // await runTask({
-    //   name: '点击发布按钮',
-    //   logs: data.logs,
-    //   task: async () => {
-    //     await iframe.waitForTimeout(500);
-    //     await iframe.click('button:text("发表")');
-    //   },
-    // });
+    await runTask({
+      name: '点击发布按钮',
+      logs: data.logs,
+      task: async () => {
+        const publishButton = page.locator('button:text("发表")');
+        await publishButton.waitFor({
+          state: 'visible',
+        });
+        await publishButton.click();
+      },
+    });
 
-    // await runTask({
-    //   name: '等待发布完成',
-    //   logs: data.logs,
-    //   task: async () => {
-    //     await page.waitForURL('https://channels.weixin.qq.com/platform/post/list');
-    //   },
-    // });
+    await runTask({
+      name: '等待发布完成',
+      logs: data.logs,
+      task: async () => {
+        await page.waitForURL('https://channels.weixin.qq.com/platform/post/list');
+      },
+    });
 
     if (!isDebug) {
-      // await runTask({
-      //   name: '关闭浏览器',
-      //   logs: data.logs,
-      //   task: async () => {
-      //     await browser.close();
-      //   },
-      // });
+      await runTask({
+        name: '关闭浏览器',
+        logs: data.logs,
+        task: async () => {
+          await browser.close();
+        },
+      });
     }
 
-    // return {
-    //   success: true,
-    //   data: data as PlatformPublishResult['data'],
-    //   message: '发布成功',
-    // };
+    return {
+      success: true,
+      data: data as PlatformPublishResult['data'],
+      message: '发布成功',
+    };
   } catch (error) {
     console.error(error);
 
     if (!isDebug) {
       // 关闭弹窗
-      // await browser.close();
+      await browser.close();
     }
 
     let message = `发布视频过程中发生错误: ${error}`;
@@ -155,7 +159,7 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
       data.code = EnumCode.ERROR_CLOSED;
     }
 
-    data.logs?.push(message);
+    log(message, data.logs);
 
     return {
       success: false,

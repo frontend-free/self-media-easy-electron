@@ -24,4 +24,4 @@ async function runTask({
   }
 }
 
-export { runTask };
+export { log, runTask };

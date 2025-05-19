@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { runTask } from '../helper';
+import { log, runTask } from '../helper';
 import { EnumCode, EnumPlatform, PlatformAuthCheckParams, PlatformAuthCheckResult } from '../types';
 
 async function authCheckTiktok(params: PlatformAuthCheckParams): Promise<PlatformAuthCheckResult> {
@@ -93,7 +93,7 @@ async function authCheckTiktok(params: PlatformAuthCheckParams): Promise<Platfor
       data.code = EnumCode.ERROR_CLOSED;
     }
 
-    data.logs?.push(message);
+    log(message, data.logs);
 
     return {
       success: false,

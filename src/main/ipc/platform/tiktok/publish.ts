@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { runTask } from '../helper';
+import { log, runTask } from '../helper';
 import { EnumCode, EnumPlatform, PlatformPublishParams, PlatformPublishResult } from '../types';
 
 async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPublishResult> {
@@ -49,11 +49,11 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
         await Promise.race([
           // 如果还在当前页，则认为登录
           page.waitForURL('https://creator.douyin.com/creator-micro/content/upload').then(() => {
-            data.logs?.push('授权信息有效');
+            log('授权信息有效', data.logs);
           }),
           // 如果跳转到了登录页，则认为授权信息失效
           page.waitForURL('https://creator.douyin.com/').then(() => {
-            data.logs?.push('授权信息失效');
+            log('授权信息失效', data.logs);
             throw new Error(EnumCode.ERROR_AUTH_INFO_INVALID);
           }),
         ]);
@@ -157,7 +157,7 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       data.code = EnumCode.ERROR_CLOSED;
     }
 
-    data.logs?.push(message);
+    log(message, data.logs);
 
     return {
       success: false,
