@@ -169,12 +169,14 @@ async function handleGetDirectoryVideoFiles(
     );
   });
 
-  console.log('filePaths', newFiles);
+  const filePaths = newFiles.map((file) => path.join(directory, file));
+
+  console.log('filePaths', filePaths);
 
   return {
     success: true,
     data: {
-      filePaths: newFiles,
+      filePaths,
     },
   };
 }
