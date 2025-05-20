@@ -64,31 +64,23 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
       name: '获取用户信息',
       logs: data.logs,
       task: async () => {
-        // 等待页面加载完成
-        await page.waitForTimeout(3000);
-
         // 获取名字
-        const nameElement = await page.waitForSelector('[class^="header-"] [class^="name-"]', {
-          timeout: 5000,
+        const name = page.locator('[class^="header-"] [class^="name-"]');
+        await name.waitFor({
+          state: 'visible',
         });
-
-        if (nameElement) {
-          log('获取到 nameElement', data.logs);
-          const name = await nameElement.textContent();
-          data.platformName = name ?? undefined;
-          log(`获取到 name: ${name}`, data.logs);
-        }
+        const nameText = await name.textContent();
+        data.platformName = nameText ?? undefined;
+        log(`获取到 name: ${nameText}`, data.logs);
 
         // 获取平台ID
-        const platformIdElement = await page.waitForSelector('[class^="unique_id-"]', {
-          timeout: 5000,
+        const platformId = page.locator('[class^="unique_id-"]');
+        await platformId.waitFor({
+          state: 'visible',
         });
-        if (platformIdElement) {
-          log('获取到 platformIdElement', data.logs);
-          const platformId = await platformIdElement.textContent();
-          data.platformId = platformId ? platformId.match(/\d+/)?.[0] : undefined;
-          log(`获取到 platformId: ${data.platformId}`, data.logs);
-        }
+        const platformIdText = await platformId.textContent();
+        data.platformId = platformIdText ? platformIdText.match(/\d+/)?.[0] : undefined;
+        log(`获取到 platformId: ${data.platformId}`, data.logs);
 
         log(`用户信息: ${JSON.stringify(data)}`, data.logs);
       },

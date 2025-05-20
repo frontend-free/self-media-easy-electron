@@ -68,9 +68,10 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       logs: data.logs,
       task: async () => {
         // 等待上传按钮出现
-        const uploadContainer = await page.waitForSelector('[class^="container-drag-"]');
-        // 获取隐藏的input元素
-        uploadButton = await uploadContainer.$('input');
+        uploadButton = page.locator('[class^="container-drag-"] input');
+        await uploadButton.waitFor({
+          state: 'hidden',
+        });
       },
     });
 
@@ -87,8 +88,9 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       logs: data.logs,
       task: async () => {
         await page.waitForTimeout(2000);
-        await page.waitForSelector('[class^="player-video-"]', {
-          // 涉及上传，可能需要较长时间
+        const video = page.locator('[class^="player-video-"]');
+        await video.waitFor({
+          state: 'visible',
           timeout: 10 * 60 * 1000,
         });
       },
@@ -98,7 +100,8 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       name: '填写标题',
       logs: data.logs,
       task: async () => {
-        await page.fill('input[class^="semi-input"]', title || '');
+        const titleInput = page.locator('input[class^="semi-input"]');
+        await titleInput.first().fill(title || '');
       },
     });
 
@@ -106,8 +109,14 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       name: '点击发布按钮',
       logs: data.logs,
       task: async () => {
-        await page.waitForTimeout(500);
-        await page.click('button:text("发布")');
+        // 需要等待一下，等表单处理好
+        await page.waitForTimeout(2000);
+
+        const publishButton = page.locator('button:text("发布")');
+        await publishButton.waitFor({
+          state: 'visible',
+        });
+        await publishButton.click();
       },
     });
 

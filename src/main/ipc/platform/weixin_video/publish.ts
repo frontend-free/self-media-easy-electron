@@ -75,15 +75,6 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
     });
 
     await runTask({
-      name: '填写标题',
-      logs: data.logs,
-      task: async () => {
-        const titleInput = page.locator('.short-title-wrap input');
-        await titleInput.fill(title || '');
-      },
-    });
-
-    await runTask({
       name: '上传视频文件',
       logs: data.logs,
       task: async () => {
@@ -98,7 +89,17 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
         const video = page.locator('#fullScreenVideo');
         await video.waitFor({
           state: 'visible',
+          timeout: 10 * 60 * 1000,
         });
+      },
+    });
+
+    await runTask({
+      name: '填写标题',
+      logs: data.logs,
+      task: async () => {
+        const titleInput = page.locator('.short-title-wrap input');
+        await titleInput.fill(title || '');
       },
     });
 
@@ -106,6 +107,9 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
       name: '点击发布按钮',
       logs: data.logs,
       task: async () => {
+        // 需要等待一下，等表单处理好
+        await page.waitForTimeout(2000);
+
         const publishButton = page.locator('button:text("发表")');
         await publishButton.waitFor({
           state: 'visible',
