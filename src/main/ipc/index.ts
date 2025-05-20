@@ -1,5 +1,6 @@
 import { app, dialog, ipcMain } from 'electron';
 import fse from 'fs-extra';
+import path from 'path';
 import { chromium } from 'playwright-core';
 import { installBrowsersForNpmInstall } from 'playwright-core/lib/server';
 import { authTiktok } from './platform/tiktok/auth';
@@ -7,17 +8,23 @@ import { authCheckTiktok } from './platform/tiktok/auth_check';
 import { publishTiktok } from './platform/tiktok/publish';
 import {
   EnumPlatform,
+  GetDirectoryVideoFilesParams,
+  GetDirectoryVideoFilesResult,
   PlatformAuthCheckParams,
   PlatformAuthCheckResult,
   PlatformAuthParams,
   PlatformAuthResult,
   PlatformPublishParams,
   PlatformPublishResult,
+  ShowOpenDialogOfOpenDirectoryResult,
   ShowOpenDialogOfOpenFileResult,
 } from './platform/types';
 import { authWeixinVideo } from './platform/weixin_video/auth';
 import { authCheckWeixinVideo } from './platform/weixin_video/auth_check';
 import { publishWeixinVideo } from './platform/weixin_video/publish';
+
+const VIDEO_EXTENSIONS = ['mp4', 'avi', 'mkv'];
+
 function handlePing(): string {
   return 'pong';
 }
@@ -109,7 +116,7 @@ async function handleShowOpenDialogOfOpenFile(): Promise<ShowOpenDialogOfOpenFil
     filters: [
       {
         name: '视频',
-        extensions: ['mp4', 'avi', 'mkv'],
+        extensions: VIDEO_EXTENSIONS,
       },
     ],
   });
@@ -118,6 +125,56 @@ async function handleShowOpenDialogOfOpenFile(): Promise<ShowOpenDialogOfOpenFil
     success: true,
     data: {
       filePaths: result.filePaths || [],
+    },
+  };
+}
+
+async function handleShowOpenDialogOfOpenDirectory(): Promise<ShowOpenDialogOfOpenDirectoryResult> {
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory'],
+  });
+
+  return {
+    success: true,
+    data: {
+      filePaths: result.filePaths || [],
+    },
+  };
+}
+
+async function handleGetDirectoryVideoFiles(
+  _,
+  arg?: GetDirectoryVideoFilesParams,
+): Promise<GetDirectoryVideoFilesResult> {
+  console.log('handleGetDirectoryVideoFiles', arg);
+
+  if (!arg || !arg.directory) {
+    return {
+      success: false,
+      message: '参数错误，请检查',
+    };
+  }
+
+  const { directory, lastRunAt } = arg;
+
+  const files = await fse.readdir(directory);
+
+  const newFiles = files.filter((file) => {
+    const stat = fse.statSync(path.join(directory, file));
+    return (
+      stat.isFile() &&
+      VIDEO_EXTENSIONS.includes(file.split('.').pop() || '') &&
+      // 过滤 创建时间 > lastRunAt 的文件
+      stat.birthtime.getTime() > (lastRunAt || 0)
+    );
+  });
+
+  console.log('filePaths', newFiles);
+
+  return {
+    success: true,
+    data: {
+      filePaths: newFiles,
     },
   };
 }
@@ -158,9 +215,12 @@ function initIpc(): void {
   ipcMain.handle('platformPublish', handlePlatformPublish);
 
   ipcMain.handle('showOpenDialogOfOpenFile', handleShowOpenDialogOfOpenFile);
+  ipcMain.handle('showOpenDialogOfOpenDirectory', handleShowOpenDialogOfOpenDirectory);
 
   ipcMain.handle('checkPlaywrightBrowser', handleCheckPlaywrightBrowser);
   ipcMain.handle('installPlaywrightBrowser', handleInstallPlaywrightBrowser);
+
+  ipcMain.handle('getDirectoryVideoFiles', handleGetDirectoryVideoFiles);
 }
 
 export { initIpc };
