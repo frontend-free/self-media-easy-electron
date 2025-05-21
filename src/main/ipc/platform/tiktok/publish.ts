@@ -17,7 +17,13 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
 
   try {
     // 创建一个干净的上下文
-    const context = await browser.newContext();
+    const context = await browser.newContext({
+      // 最小化
+      viewport: {
+        width: 1,
+        height: 1,
+      },
+    });
 
     await runTask({
       name: '加载授权信息 cookies',

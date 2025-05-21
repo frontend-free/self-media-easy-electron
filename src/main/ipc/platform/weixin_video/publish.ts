@@ -11,6 +11,7 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
   };
 
   const browser = await chromium.launch({
+    // 特殊处理，true 就跑不通。
     headless: false,
     // 视频号需要使用 chrome，否则无法识别视频。 更多见 https://sap-doc.nasdaddy.com/docs/tutorial-basics/platform-channels/
     channel: 'chrome',
@@ -18,7 +19,13 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
 
   try {
     // 创建一个干净的上下文
-    const context = await browser.newContext();
+    const context = await browser.newContext({
+      // 最小化
+      viewport: {
+        width: 1,
+        height: 1,
+      },
+    });
 
     await runTask({
       name: '加载授权信息 cookies',

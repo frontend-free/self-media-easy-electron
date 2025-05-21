@@ -14,7 +14,7 @@ async function authCheckWeixinVideo(
 
   // 显示浏览器窗口
   const browser = await chromium.launch({
-    headless: false,
+    headless: true,
     channel: 'chrome',
   });
 
