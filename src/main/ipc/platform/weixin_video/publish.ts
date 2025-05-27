@@ -111,7 +111,7 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
         // 需要等待一下，等表单处理好
         await page.waitForTimeout(2000);
 
-        const publishButton = page.locator('button:text("发表")');
+        const publishButton = page.locator('button.weui-desktop-btn_primary:text-is("发表")');
         await publishButton.waitFor({
           state: 'visible',
         });
