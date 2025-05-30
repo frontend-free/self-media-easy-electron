@@ -9,3 +9,5 @@ out
 
 .env.local
 .env.development
+
+record_video

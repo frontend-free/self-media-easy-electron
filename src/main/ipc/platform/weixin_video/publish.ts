@@ -19,7 +19,11 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
 
   try {
     // 创建一个干净的上下文
-    const context = await browser.newContext({});
+    const context = await browser.newContext({
+      recordVideo: {
+        dir: 'record_video',
+      },
+    });
 
     await runTask({
       name: '加载授权信息 cookies',

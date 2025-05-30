@@ -22,7 +22,11 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
 
   try {
     // 创建一个干净的上下文
-    const context = await browser.newContext();
+    const context = await browser.newContext({
+      recordVideo: {
+        dir: 'record_video',
+      },
+    });
     // 创建页面
     const page = await context.newPage();
 
