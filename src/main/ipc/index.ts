@@ -3,6 +3,7 @@ import fse from 'fs-extra';
 import path from 'path';
 import { chromium } from 'playwright-core';
 import { installBrowsersForNpmInstall } from 'playwright-core/lib/server';
+import { test } from '../recorder/test';
 import { authTiktok } from './platform/tiktok/auth';
 import { authCheckTiktok } from './platform/tiktok/auth_check';
 import { publishTiktok } from './platform/tiktok/publish';
@@ -27,6 +28,11 @@ const VIDEO_EXTENSIONS = ['mp4', 'avi', 'mkv'];
 
 function handlePing(): string {
   return 'pong';
+}
+
+function handleTest(): void {
+  console.log('handleTest');
+  test();
 }
 
 async function handlePlatformAuth(_, arg?: PlatformAuthParams): Promise<PlatformAuthResult> {
@@ -208,6 +214,7 @@ async function handleInstallPlaywrightBrowser(): Promise<void> {
 function initIpc(): void {
   // test
   ipcMain.handle('ping', handlePing);
+  ipcMain.handle('test', handleTest);
 
   // 获取版本号
   ipcMain.handle('getVersion', handleGetVersion);
