@@ -1,5 +1,11 @@
-import { AutoCheckAndRecordParams, RecordManager, StopRecordParams } from '../recorder/manage';
-import { EnumRecorderStatus } from '../recorder/recorder';
+import { omit } from 'lodash-es';
+import {
+  AutoCheckAndRecordParams,
+  GetRecordersResult,
+  RecorderInfo,
+  RecordManager,
+  StopRecordParams,
+} from '../recorder/manage';
 
 async function handleAutoCheckAndRecord(
   _,
@@ -7,7 +13,7 @@ async function handleAutoCheckAndRecord(
 ): Promise<{
   success: boolean;
   message?: string;
-  data?: EnumRecorderStatus;
+  data?: RecorderInfo;
 }> {
   console.log('handleAutoCheckAndRecord', arg);
 
@@ -22,7 +28,7 @@ async function handleAutoCheckAndRecord(
 
   return {
     success: true,
-    data: res!,
+    data: omit(res, ['recorder.stop']),
   };
 }
 
@@ -48,4 +54,25 @@ async function handleStopRecord(
   };
 }
 
-export { handleAutoCheckAndRecord, handleStopRecord };
+async function handleGetRecorders(): Promise<{
+  success: boolean;
+  data?: GetRecordersResult;
+  message?: string;
+}> {
+  console.log('handleGetRecorders');
+
+  const res = await RecordManager.getRecorders();
+
+  const data = {};
+
+  Object.keys(res).forEach((key) => {
+    data[key] = omit(res[key], ['recorder.stop']);
+  });
+
+  return {
+    success: true,
+    data,
+  };
+}
+
+export { handleAutoCheckAndRecord, handleGetRecorders, handleStopRecord };

@@ -3,6 +3,7 @@ import fse from 'fs-extra';
 import path from 'path';
 import { chromium } from 'playwright-core';
 import { installBrowsersForNpmInstall } from 'playwright-core/lib/server';
+import { handleAutoCheckAndRecord, handleGetRecorders, handleStopRecord } from './ipc_record';
 import { authTiktok } from './platform/tiktok/auth';
 import { authCheckTiktok } from './platform/tiktok/auth_check';
 import { publishTiktok } from './platform/tiktok/publish';
@@ -22,7 +23,6 @@ import {
 import { authWeixinVideo } from './platform/weixin_video/auth';
 import { authCheckWeixinVideo } from './platform/weixin_video/auth_check';
 import { publishWeixinVideo } from './platform/weixin_video/publish';
-import { handleAutoCheckAndRecord, handleStopRecord } from './record';
 
 const VIDEO_EXTENSIONS = ['mp4', 'avi', 'mkv'];
 
@@ -227,6 +227,7 @@ function initIpc(): void {
   // record 相关
   ipcMain.handle('autoCheckAndRecord', handleAutoCheckAndRecord);
   ipcMain.handle('stopRecord', handleStopRecord);
+  ipcMain.handle('getRecorders', handleGetRecorders);
 }
 
 export { initIpc };

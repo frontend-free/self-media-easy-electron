@@ -1,60 +1,57 @@
-import { CheckAndRecordResult, EnumRecorderStatus, Recorder } from './recorder';
+import { CheckAndRecordResult, Recorder } from './recorder';
 
-const recorderMap: Record<
-  string,
-  | {
-      loading: boolean;
-      recorder?: CheckAndRecordResult;
-    }
-  | undefined
-> = {};
+enum EnumRecorderStatus {
+  // 初始
+  INIT = 'init',
+  // 创建中
+  CREATING = 'creating',
+  // 记录中
+  RECORDING = 'recording',
+  // 结束了
+  END = 'end',
+}
+
+interface RecorderInfo {
+  status: EnumRecorderStatus;
+  recorder?: CheckAndRecordResult;
+}
+
+const recorderMap: Record<string, RecorderInfo> = {};
 
 interface AutoCheckAndRecordParams {
   roomId: string;
   outputDir: string;
   fileName?: string;
 }
-
-interface StopRecordParams {
-  roomId: string;
-}
-
 async function autoCheckAndRecord({
   roomId,
   outputDir,
   fileName,
-}: AutoCheckAndRecordParams): Promise<void | EnumRecorderStatus> {
+}: AutoCheckAndRecordParams): Promise<RecorderInfo> {
   // 如果有
   if (recorderMap[roomId]) {
-    const { recorder, loading } = recorderMap[roomId];
+    const info = recorderMap[roomId];
 
-    // 如果正在创建中，则忽略
-    if (loading || !recorder) {
-      return EnumRecorderStatus.INIT;
+    // 这些状态，直接返回数据。
+    if (
+      info.status === EnumRecorderStatus.INIT ||
+      info.status === EnumRecorderStatus.CREATING ||
+      info.status === EnumRecorderStatus.RECORDING
+    ) {
+      return info;
     }
 
-    const status = recorder.getStatus();
-
-    // 如果初始化，则忽略。
-    if (status === EnumRecorderStatus.INIT) {
-      return status;
-    }
-
-    // 如果正在进行中，则忽略。
-    if (status === EnumRecorderStatus.PROCESSING) {
-      return status;
-    }
-
-    // 如果已经结束或者错误。则移除
-    if (status === EnumRecorderStatus.END || status === EnumRecorderStatus.ERROR) {
-      recorderMap[roomId] = undefined;
-      return status;
+    // 如果已经结束，流程继续
+    if (info.status === EnumRecorderStatus.END) {
+      // nothing
     }
   }
 
-  // 进行中
+  // 流程继续：拉起一个新的 record
+
   recorderMap[roomId] = {
-    loading: true,
+    status: EnumRecorderStatus.CREATING,
+    recorder: undefined,
   };
 
   // 创建
@@ -67,61 +64,71 @@ async function autoCheckAndRecord({
     {
       // 如果结束，清空
       onEnd: () => {
-        recorderMap[roomId] = undefined;
+        console.log('onEnd', roomId);
+        // 更新为 end
+        recorderMap[roomId].status = EnumRecorderStatus.END;
       },
       // 如果出错，清空
-      onError: () => {
-        recorderMap[roomId] = undefined;
+      onError: (err) => {
+        console.log('onError', roomId, err);
+        // 简单处理，也更新为 end
+        recorderMap[roomId].status = EnumRecorderStatus.END;
       },
     },
   );
 
-  // 没有开播或者其他原因，则清空
-  if (!recorder) {
-    recorderMap[roomId] = undefined;
-    // void
-    return;
+  // 没有开播，则状态更新为 end
+  if (!recorder.roomInfo.isLiving) {
+    recorderMap[roomId] = {
+      status: EnumRecorderStatus.END,
+      recorder,
+    };
+
+    return recorderMap[roomId];
   }
 
-  // 因为是异步，如果 undefined。则被 stopRecord 了。
-  if (!recorderMap[roomId]) {
-    // 停止
+  // 因为是异步，如果 end，可能被 stopRecord 了。
+  if (recorderMap[roomId].status === EnumRecorderStatus.END) {
+    // 则停止刚刚新建的
     recorder.stop();
-    return EnumRecorderStatus.END;
+
+    return recorderMap[roomId];
   }
 
   // 否则记录下来。
   recorderMap[roomId] = {
-    loading: false,
+    status: EnumRecorderStatus.RECORDING,
     recorder,
   };
 
-  return EnumRecorderStatus.PROCESSING;
+  return recorderMap[roomId];
 }
 
+interface StopRecordParams {
+  roomId: string;
+}
 function stopRecord({ roomId }: StopRecordParams): void {
   if (!recorderMap[roomId]) {
     return;
   }
 
-  const { recorder } = recorderMap[roomId];
+  const info = recorderMap[roomId];
+  // everyway stop 一下
+  info.recorder?.stop();
+  // 状态更新为 end
+  info.status = EnumRecorderStatus.END;
+}
 
-  // 但是没有创建
-  if (!recorder) {
-    // 清空即可
-    recorderMap[roomId] = undefined;
-    return;
-  }
-
-  // 停止
-  recorder.stop();
-  recorderMap[roomId] = undefined;
+type GetRecordersResult = Record<string, RecorderInfo>;
+function getRecorders(): GetRecordersResult {
+  return recorderMap;
 }
 
 const RecordManager = {
   autoCheckAndRecord,
   stopRecord,
+  getRecorders,
 };
 
 export { RecordManager };
-export type { AutoCheckAndRecordParams, StopRecordParams };
+export type { AutoCheckAndRecordParams, GetRecordersResult, RecorderInfo, StopRecordParams };
