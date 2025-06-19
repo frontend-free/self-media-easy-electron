@@ -102,3 +102,4 @@ async function getRoomInfo({ roomId }: { roomId: string }): Promise<GetRoomInfoR
 }
 
 export { getRoomInfo };
+export type { GetRoomInfoResult };

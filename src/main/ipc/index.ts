@@ -3,7 +3,6 @@ import fse from 'fs-extra';
 import path from 'path';
 import { chromium } from 'playwright-core';
 import { installBrowsersForNpmInstall } from 'playwright-core/lib/server';
-import { test } from '../recorder/test';
 import { authTiktok } from './platform/tiktok/auth';
 import { authCheckTiktok } from './platform/tiktok/auth_check';
 import { publishTiktok } from './platform/tiktok/publish';
@@ -23,16 +22,12 @@ import {
 import { authWeixinVideo } from './platform/weixin_video/auth';
 import { authCheckWeixinVideo } from './platform/weixin_video/auth_check';
 import { publishWeixinVideo } from './platform/weixin_video/publish';
+import { handleAutoCheckAndRecord, handleStopRecord } from './record';
 
 const VIDEO_EXTENSIONS = ['mp4', 'avi', 'mkv'];
 
 function handlePing(): string {
   return 'pong';
-}
-
-function handleTest(): void {
-  console.log('handleTest');
-  test();
 }
 
 async function handlePlatformAuth(_, arg?: PlatformAuthParams): Promise<PlatformAuthResult> {
@@ -212,9 +207,7 @@ async function handleInstallPlaywrightBrowser(): Promise<void> {
 }
 
 function initIpc(): void {
-  // test
   ipcMain.handle('ping', handlePing);
-  ipcMain.handle('test', handleTest);
 
   // 获取版本号
   ipcMain.handle('getVersion', handleGetVersion);
@@ -230,6 +223,10 @@ function initIpc(): void {
   ipcMain.handle('installPlaywrightBrowser', handleInstallPlaywrightBrowser);
 
   ipcMain.handle('getDirectoryVideoFiles', handleGetDirectoryVideoFiles);
+
+  // record 相关
+  ipcMain.handle('autoCheckAndRecord', handleAutoCheckAndRecord);
+  ipcMain.handle('stopRecord', handleStopRecord);
 }
 
 export { initIpc };

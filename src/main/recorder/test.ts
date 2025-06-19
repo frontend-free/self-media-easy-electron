@@ -1,4 +1,4 @@
-import { checkAndRecord } from './recorder';
+import { Recorder } from './recorder';
 
 async function test(): Promise<void> {
   console.log('test');
@@ -10,7 +10,20 @@ async function test(): Promise<void> {
 
   // await checkAndRecord({ roomId: '282773369501', output: '/Users/liyatang/test.mp4' });
 
-  await checkAndRecord({ roomId: '646454278948', output: '/Users/liyatang/test.mp4' });
+  const recorder = await Recorder.checkAndRecord(
+    { roomId: '646454278948', output: '/Users/liyatang/test.mp4' },
+    {
+      onStart: () => {
+        console.log('onStart');
+      },
+      onEnd: () => {
+        console.log('onEnd');
+      },
+      onError: (err) => {
+        console.log('onError', err);
+      },
+    },
+  );
 }
 
 export { test };
