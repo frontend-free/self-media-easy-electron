@@ -3,7 +3,7 @@ import fse from 'fs-extra';
 import path from 'path';
 import { chromium } from 'playwright-core';
 import { installBrowsersForNpmInstall } from 'playwright-core/lib/server';
-import { handleAutoCheckAndRecord, handleGetRecorders, handleStopRecord } from './ipc_record';
+import { ipcMainApiOfRecorder } from './ipc_record';
 import { authTiktok } from './platform/tiktok/auth';
 import { authCheckTiktok } from './platform/tiktok/auth_check';
 import { publishTiktok } from './platform/tiktok/publish';
@@ -224,10 +224,40 @@ function initIpc(): void {
 
   ipcMain.handle('getDirectoryVideoFiles', handleGetDirectoryVideoFiles);
 
-  // record 相关
-  ipcMain.handle('autoCheckAndRecord', handleAutoCheckAndRecord);
-  ipcMain.handle('stopRecord', handleStopRecord);
-  ipcMain.handle('getRecorders', handleGetRecorders);
+  const ipcMainApi = {
+    // record 相关
+    ...ipcMainApiOfRecorder,
+  };
+
+  Object.keys(ipcMainApi).forEach((key) => {
+    const func = ipcMainApi[key];
+    ipcMainApi[key] = async (_, arg) => {
+      console.log(key, 'params', arg);
+
+      try {
+        const data = await func(_, arg);
+        const res = {
+          success: true,
+          data,
+        };
+
+        console.log(key, 'res', res);
+
+        return res;
+      } catch (err) {
+        console.error(key, 'err', err);
+
+        return {
+          success: false,
+          message: err instanceof Error ? err.message : '未知错误',
+        };
+      }
+    };
+  });
+
+  Object.keys(ipcMainApi).forEach((key) => {
+    ipcMain.handle(key, ipcMainApi[key]);
+  });
 }
 
 export { initIpc };

@@ -7,60 +7,18 @@ import {
   StopRecordParams,
 } from '../recorder/manage';
 
-async function handleAutoCheckAndRecord(
-  _,
-  arg?: AutoCheckAndRecordParams,
-): Promise<{
-  success: boolean;
-  message?: string;
-  data?: RecorderInfo;
-}> {
-  console.log('handleAutoCheckAndRecord', arg);
-
-  if (!arg || !arg.roomId || !arg.outputDir) {
-    return {
-      success: false,
-      message: '参数错误，请检查',
-    };
-  }
-
+async function handleAutoCheckAndRecord(_, arg: AutoCheckAndRecordParams): Promise<RecorderInfo> {
   const res = await RecordManager.autoCheckAndRecord(arg);
-
-  return {
-    success: true,
-    data: omit(res, ['recorder.stop']),
-  };
+  return omit(res, ['recorder.stop']);
 }
 
-async function handleStopRecord(
-  _,
-  arg?: StopRecordParams,
-): Promise<{
-  success: boolean;
-  message?: string;
-}> {
-  console.log('handleStopRecord', arg);
-  if (!arg || !arg.roomId) {
-    return {
-      success: false,
-      message: '参数错误，请检查',
-    };
-  }
-
+async function handleStopRecord(_, arg: StopRecordParams): Promise<undefined> {
   await RecordManager.stopRecord(arg);
 
-  return {
-    success: true,
-  };
+  return;
 }
 
-async function handleGetRecorders(): Promise<{
-  success: boolean;
-  data?: GetRecordersResult;
-  message?: string;
-}> {
-  console.log('handleGetRecorders');
-
+async function handleGetRecorders(): Promise<GetRecordersResult> {
   const res = await RecordManager.getRecorders();
 
   const data = {};
@@ -69,10 +27,13 @@ async function handleGetRecorders(): Promise<{
     data[key] = omit(res[key], ['recorder.stop']);
   });
 
-  return {
-    success: true,
-    data,
-  };
+  return data;
 }
 
-export { handleAutoCheckAndRecord, handleGetRecorders, handleStopRecord };
+const ipcMainApiOfRecorder = {
+  autoCheckAndRecord: handleAutoCheckAndRecord,
+  stopRecord: handleStopRecord,
+  getRecorders: handleGetRecorders,
+};
+
+export { ipcMainApiOfRecorder };
