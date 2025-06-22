@@ -88,7 +88,7 @@ async function getRoomInfo({ roomId }: { roomId: string }): Promise<GetRoomInfoR
   const streamData = JSON.parse(stringStreamData);
 
   const qualities = Object.keys(streamData.data);
-  const quality = qualities.includes(EnumQuality.LD) ? EnumQuality.LD : qualities[0];
+  const quality = qualities.includes(EnumQuality.HD) ? EnumQuality.HD : qualities[0];
   const stream = streamData.data[quality].main.flv;
 
   return {

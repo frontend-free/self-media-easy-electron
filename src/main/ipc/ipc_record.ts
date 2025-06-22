@@ -7,18 +7,18 @@ import {
   StopRecordParams,
 } from '../recorder/manage';
 
-async function handleAutoCheckAndRecord(_, arg: AutoCheckAndRecordParams): Promise<RecorderInfo> {
+async function autoCheckAndRecord(_, arg: AutoCheckAndRecordParams): Promise<RecorderInfo> {
   const res = await RecordManager.autoCheckAndRecord(arg);
   return omit(res, ['recorder.stop']);
 }
 
-async function handleStopRecord(_, arg: StopRecordParams): Promise<undefined> {
+async function stopRecord(_, arg: StopRecordParams): Promise<undefined> {
   await RecordManager.stopRecord(arg);
 
   return;
 }
 
-async function handleGetRecorders(): Promise<GetRecordersResult> {
+async function getRecorders(): Promise<GetRecordersResult> {
   const res = await RecordManager.getRecorders();
 
   const data = {};
@@ -31,9 +31,9 @@ async function handleGetRecorders(): Promise<GetRecordersResult> {
 }
 
 const ipcMainApiOfRecorder = {
-  autoCheckAndRecord: handleAutoCheckAndRecord,
-  stopRecord: handleStopRecord,
-  getRecorders: handleGetRecorders,
+  autoCheckAndRecord,
+  stopRecord,
+  getRecorders,
 };
 
 export { ipcMainApiOfRecorder };

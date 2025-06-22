@@ -71,45 +71,12 @@ interface PlatformPublishResult {
   message?: string;
 }
 
-interface ShowOpenDialogOfOpenFileResult {
-  success: boolean;
-  data?: {
-    filePaths: string[];
-  };
-  message?: string;
-}
-
-interface ShowOpenDialogOfOpenDirectoryResult {
-  success: boolean;
-  data?: {
-    filePaths: string[];
-  };
-  message?: string;
-}
-
-interface GetDirectoryVideoFilesParams {
-  directory: string;
-  lastRunAt?: number;
-}
-
-interface GetDirectoryVideoFilesResult {
-  success: boolean;
-  data?: {
-    filePaths: string[];
-  };
-  message?: string;
-}
-
 export { EnumCode, EnumPlatform };
 export type {
-  GetDirectoryVideoFilesParams,
-  GetDirectoryVideoFilesResult,
   PlatformAuthCheckParams,
   PlatformAuthCheckResult,
   PlatformAuthParams,
   PlatformAuthResult,
   PlatformPublishParams,
   PlatformPublishResult,
-  ShowOpenDialogOfOpenDirectoryResult,
-  ShowOpenDialogOfOpenFileResult,
 };

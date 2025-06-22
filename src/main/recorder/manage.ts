@@ -2,13 +2,11 @@ import { CheckAndRecordResult, Recorder } from './recorder';
 
 enum EnumRecorderStatus {
   // 初始
-  INIT = 'init',
-  // 创建中
-  CREATING = 'creating',
+  INIT = 'INIT',
   // 记录中
-  RECORDING = 'recording',
+  RECORDING = 'RECORDING',
   // 结束了
-  END = 'end',
+  END = 'END',
 }
 
 interface RecorderInfo {
@@ -33,11 +31,7 @@ async function autoCheckAndRecord({
     const info = recorderMap[roomId];
 
     // 这些状态，直接返回数据。
-    if (
-      info.status === EnumRecorderStatus.INIT ||
-      info.status === EnumRecorderStatus.CREATING ||
-      info.status === EnumRecorderStatus.RECORDING
-    ) {
+    if (info.status === EnumRecorderStatus.INIT || info.status === EnumRecorderStatus.RECORDING) {
       return info;
     }
 
@@ -50,35 +44,44 @@ async function autoCheckAndRecord({
   // 流程继续：拉起一个新的 record
 
   recorderMap[roomId] = {
-    status: EnumRecorderStatus.CREATING,
+    status: EnumRecorderStatus.INIT,
     recorder: undefined,
   };
 
-  // 创建
-  const recorder = await Recorder.checkAndRecord(
-    {
-      roomId,
-      outputDir,
-      fileName,
-    },
-    {
-      // 如果结束，清空
-      onEnd: () => {
-        console.log('onEnd', roomId);
-        // 更新为 end
-        recorderMap[roomId].status = EnumRecorderStatus.END;
+  let recorder;
+  try {
+    // 创建
+    recorder = await Recorder.checkAndRecord(
+      {
+        roomId,
+        outputDir,
+        fileName,
       },
-      // 如果出错，清空
-      onError: (err) => {
-        console.log('onError', roomId, err);
-        // 简单处理，也更新为 end
-        recorderMap[roomId].status = EnumRecorderStatus.END;
+      {
+        // 如果结束，清空
+        onEnd: () => {
+          console.log('onEnd', roomId);
+          // 更新为 end
+          recorderMap[roomId].status = EnumRecorderStatus.END;
+        },
+        // 如果出错，清空
+        onError: (err) => {
+          console.log('onError', roomId, err);
+          // 简单处理，也更新为 end
+          recorderMap[roomId].status = EnumRecorderStatus.END;
+        },
       },
-    },
-  );
+    );
+  } catch (err) {
+    console.log('Recorder.checkAndRecord error', err);
+    // err 当 end 简单处理
+    recorderMap[roomId].status = EnumRecorderStatus.END;
+    // 返回信息
+    return recorderMap[roomId];
+  }
 
   // 没有开播，则状态更新为 end
-  if (!recorder.roomInfo.isLiving) {
+  if (!recorder.roomInfo?.isLiving) {
     recorderMap[roomId] = {
       status: EnumRecorderStatus.END,
       recorder,

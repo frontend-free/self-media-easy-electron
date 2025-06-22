@@ -10,7 +10,7 @@ type CheckAndRecordResult = {
   outputDir: string;
   fileName?: string;
   output: string;
-  roomInfo: GetRoomInfoResult;
+  roomInfo?: GetRoomInfoResult;
   stop: () => void;
 };
 
@@ -38,18 +38,14 @@ async function checkAndRecord(
   // 初始化
   initFfmpeg();
 
-  // 获取房间信息
-  const roomInfo = await getRoomInfo({ roomId });
-
-  console.log('roomInfo', roomInfo);
-
   const output = path.resolve(
     outputDir,
-    fileName || `${roomInfo.roomId}_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.mp4`,
+    fileName || `${roomId}_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.mp4`,
   );
   console.log('output', output);
 
-  const result = {
+  let roomInfo: CheckAndRecordResult['roomInfo'] = undefined;
+  const result: CheckAndRecordResult = {
     roomId,
     outputDir,
     fileName,
@@ -61,6 +57,20 @@ async function checkAndRecord(
       command.kill('SIGINT');
     },
   };
+
+  try {
+    // 获取房间信息
+    roomInfo = await getRoomInfo({ roomId });
+    result.roomInfo = roomInfo;
+    console.log('roomInfo', roomInfo);
+  } catch (err) {
+    console.log('getRoomInfo error', err);
+  }
+
+  // 失败了
+  if (!roomInfo) {
+    return result;
+  }
 
   // 没有直播，返回数据
   if (!roomInfo.isLiving) {
@@ -78,6 +88,7 @@ async function checkAndRecord(
     .output(output);
 
   command.on('start', function () {
+    console.log('ffmpeg start');
     options.onStart?.();
   });
 
@@ -85,12 +96,13 @@ async function checkAndRecord(
     options.onProcess?.();
   });
 
-  command.on('end', function () {
+  command.on('end', function (stdout, stderr) {
+    console.log('ffmpeg end', stdout, stderr);
     options.onEnd?.();
   });
 
-  command.on('error', function (err) {
-    console.log('ffmpeg error', err);
+  command.on('error', function (err, stdout, stderr) {
+    console.log('ffmpeg error', err, stdout, stderr);
 
     // 255 是 kill SIGINT ?
     // 先当是，按 end 处理，不走 error
@@ -99,6 +111,11 @@ async function checkAndRecord(
       return;
     }
 
+    // 识别更多 error
+
+    // 应该不会导致循环，因为 kill 后就没了，不会再 on error
+    console.log('error stop');
+    command.kill('SIGINT');
     options.onError?.(err);
   });
 
