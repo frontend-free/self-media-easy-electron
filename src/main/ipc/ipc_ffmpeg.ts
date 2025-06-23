@@ -34,9 +34,9 @@ async function downloadAndUnzip({
 
 function getDownloadUrl(): string {
   if (is.macOS()) {
-    return 'https://evermeet.cx/pub/ffmpeg/ffmpeg-7.1.1.zip';
+    return 'http://47.105.58.181:3001/ffmpeg/ffmpeg-7.1.1.zip';
   }
-  return 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl-shared.zip';
+  return 'http://47.105.58.181:3001/ffmpeg/ffmpeg-master-latest-win64-gpl-shared.zip';
 }
 
 const ipcMainApiOfFfmpeg = {
