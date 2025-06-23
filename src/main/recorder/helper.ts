@@ -23,9 +23,9 @@ const inputOptionsArgs = [
 
 function getFfmpegPath(): string {
   if (is.macOS()) {
-    return path.resolve('./ffmpeg');
+    return path.resolve('./ffmpeg/ffmpeg');
   }
-  return path.resolve('./ffmpeg/bin/ffmpeg.exe');
+  return path.resolve('./ffmpeg/ffmpeg-master-latest-win64-gpl-shared/bin/ffmpeg.exe');
 }
 
 export { ffmpegOutputOptions, getFfmpegPath, inputOptionsArgs };
