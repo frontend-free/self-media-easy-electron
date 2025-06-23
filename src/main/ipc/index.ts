@@ -1,8 +1,7 @@
 import { app, ipcMain } from 'electron';
-import fse from 'fs-extra';
-import { chromium } from 'playwright-core';
-import { installBrowsersForNpmInstall } from 'playwright-core/lib/server';
+import { ipcMainApiOfFfmpeg } from './ipc_ffmpeg';
 import { ipcMainApiOfFile } from './ipc_file';
+import { ipcMainApiOfPlaywright } from './ipc_playwright';
 import { ipcMainApiOfRecorder } from './ipc_record';
 import { authTiktok } from './platform/tiktok/auth';
 import { authCheckTiktok } from './platform/tiktok/auth_check';
@@ -19,10 +18,6 @@ import {
 import { authWeixinVideo } from './platform/weixin_video/auth';
 import { authCheckWeixinVideo } from './platform/weixin_video/auth_check';
 import { publishWeixinVideo } from './platform/weixin_video/publish';
-
-function handlePing(): string {
-  return 'pong';
-}
 
 async function handlePlatformAuth(_, arg?: PlatformAuthParams): Promise<PlatformAuthResult> {
   console.log('handlePlatformAuth', arg);
@@ -105,48 +100,29 @@ async function handlePlatformPublish(
   }
 }
 
-function handleGetVersion(): string {
-  return app.getVersion();
-}
-
-async function handleCheckPlaywrightBrowser(): Promise<void> {
-  const res = chromium.executablePath();
-
-  // 检查 res 路径是否存在
-  if (res) {
-    if (fse.existsSync(res)) {
-      return;
-    }
-  }
-
-  throw new Error('Playwright Chromium 没有安装');
-}
-
-async function handleInstallPlaywrightBrowser(): Promise<void> {
-  // 使用 Playwright 的 API 安装浏览器
-  await installBrowsersForNpmInstall(['chromium', 'chromium-headless-shell', 'ffmpeg']);
-
-  console.log('Playwright Chromium 安装成功');
-}
-
 function initIpc(): void {
-  ipcMain.handle('ping', handlePing);
+  ipcMain.handle('ping', () => {
+    return 'pong';
+  });
 
   // 获取版本号
-  ipcMain.handle('getVersion', handleGetVersion);
+  ipcMain.handle('getVersion', () => {
+    return app.getVersion();
+  });
 
   ipcMain.handle('platformAuth', handlePlatformAuth);
   ipcMain.handle('platformAuthCheck', handlePlatformAuthCheck);
   ipcMain.handle('platformPublish', handlePlatformPublish);
-
-  ipcMain.handle('checkPlaywrightBrowser', handleCheckPlaywrightBrowser);
-  ipcMain.handle('installPlaywrightBrowser', handleInstallPlaywrightBrowser);
 
   const ipcMainApi = {
     // 文件相关
     ...ipcMainApiOfFile,
     // record 相关
     ...ipcMainApiOfRecorder,
+    // playwright 相关
+    ...ipcMainApiOfPlaywright,
+    // ffmpeg 相关
+    ...ipcMainApiOfFfmpeg,
   };
 
   Object.keys(ipcMainApi).forEach((key) => {

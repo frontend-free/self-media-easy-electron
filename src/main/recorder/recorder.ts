@@ -3,7 +3,7 @@ import ffmpeg from 'fluent-ffmpeg';
 import fse from 'fs-extra';
 import path from 'path';
 import { getRoomInfo, GetRoomInfoResult } from './douyin';
-import { ffmpegOutputOptions, inputOptionsArgs } from './helper';
+import { ffmpegOutputOptions, getFfmpegPath, inputOptionsArgs } from './helper';
 
 type CheckAndRecordResult = {
   roomId: string;
@@ -15,8 +15,7 @@ type CheckAndRecordResult = {
 };
 
 function initFfmpeg(): void {
-  // TODO ffmpeg.setFfmpegPath(ffmpegPathFromModule);
-  ffmpeg.setFfmpegPath('/opt/homebrew/bin/ffmpeg');
+  ffmpeg.setFfmpegPath(getFfmpegPath());
 }
 
 async function checkAndRecord(

@@ -1,3 +1,6 @@
+import is from 'electron-is';
+import path from 'path';
+
 const ffmpegOutputOptions: string[] = [
   '-c copy',
   '-movflags frag_keyframe',
@@ -18,4 +21,11 @@ const inputOptionsArgs = [
   (64 * 1024).toString(),
 ];
 
-export { ffmpegOutputOptions, inputOptionsArgs };
+function getFfmpegPath(): string {
+  if (is.macOS()) {
+    return path.resolve('./ffmpeg');
+  }
+  return path.resolve('./ffmpeg/bin/ffmpeg.exe');
+}
+
+export { ffmpegOutputOptions, getFfmpegPath, inputOptionsArgs };

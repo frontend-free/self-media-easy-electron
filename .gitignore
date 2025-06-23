@@ -11,3 +11,5 @@ out
 .env.development
 
 record_video
+
+ffmpeg
