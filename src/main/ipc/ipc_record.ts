@@ -1,4 +1,5 @@
 import { omit } from 'lodash-es';
+import { getRoomInfo as douyinGetRoomInfo, GetRoomInfoResult } from '../recorder/douyin';
 import {
   AutoCheckAndRecordParams,
   GetRecordersResult,
@@ -6,6 +7,11 @@ import {
   RecordManager,
   StopRecordParams,
 } from '../recorder/manage';
+
+async function getRoomInfo(_, arg: { roomId: string }): Promise<GetRoomInfoResult> {
+  const res = await douyinGetRoomInfo(arg);
+  return res;
+}
 
 async function autoCheckAndRecord(_, arg: AutoCheckAndRecordParams): Promise<RecorderInfo> {
   const res = await RecordManager.autoCheckAndRecord(arg);
@@ -31,6 +37,7 @@ async function getRecorders(): Promise<GetRecordersResult> {
 }
 
 const ipcMainApiOfRecorder = {
+  getRoomInfo,
   autoCheckAndRecord,
   stopRecord,
   getRecorders,
