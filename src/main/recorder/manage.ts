@@ -80,8 +80,8 @@ async function autoCheckAndRecord({
     return recorderMap[roomId];
   }
 
-  // 没有开播，则状态更新为 end
-  if (!recorder.roomInfo?.isLiving) {
+  // 有错误，则状态更新为 end
+  if (recorder.error) {
     recorderMap[roomId] = {
       status: EnumRecorderStatus.END,
       recorder,

@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { log, runTask } from '../helper';
+import { getRecordVideoDir, log, runTask } from '../helper';
 import { EnumCode, EnumPlatform, PlatformPublishParams, PlatformPublishResult } from '../types';
 
 async function publishWeixinVideo(params: PlatformPublishParams): Promise<PlatformPublishResult> {
@@ -21,7 +21,7 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
     // 创建一个干净的上下文
     const context = await browser.newContext({
       recordVideo: {
-        dir: 'record_video',
+        dir: getRecordVideoDir(),
       },
     });
 

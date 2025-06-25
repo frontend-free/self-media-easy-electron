@@ -5,12 +5,5 @@ out
 .eslintcache
 *.log*
 
-
-
 .env.local
 .env.development
-
-record_video
-
-ffmpeg
-ffmpeg.zip

@@ -1,3 +1,4 @@
+import { app } from 'electron';
 import is from 'electron-is';
 import path from 'path';
 
@@ -21,11 +22,25 @@ const inputOptionsArgs = [
   (64 * 1024).toString(),
 ];
 
-function getFfmpegPath(): string {
-  if (is.macOS()) {
-    return path.resolve('./ffmpeg/ffmpeg');
-  }
-  return path.resolve('./ffmpeg/ffmpeg-master-latest-win64-gpl-shared/bin/ffmpeg.exe');
+function getFfmpegDir(): string {
+  const dataPath = app.getPath('userData');
+  console.log('dataPath', dataPath);
+
+  return path.resolve(dataPath, 'downloads', './ffmpeg/');
 }
 
-export { ffmpegOutputOptions, getFfmpegPath, inputOptionsArgs };
+function getFfmpegPath(): string {
+  const dir = getFfmpegDir();
+
+  if (is.macOS()) {
+    return path.resolve(dir, './ffmpeg');
+  }
+
+  return path.resolve(dir, './ffmpeg-master-latest-win64-gpl-shared/bin/ffmpeg.exe');
+}
+
+function getZipFilePath(): string {
+  return path.resolve(getFfmpegDir(), 'ffmpeg.zip');
+}
+
+export { ffmpegOutputOptions, getFfmpegDir, getFfmpegPath, getZipFilePath, inputOptionsArgs };

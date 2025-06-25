@@ -1,3 +1,6 @@
+import { app } from 'electron';
+import path from 'path';
+
 function log(message: string, logs?: string[]): void {
   const msg = `[${new Date().toISOString()}] ${message}`;
   logs?.push(msg);
@@ -24,4 +27,9 @@ async function runTask({
   }
 }
 
-export { log, runTask };
+function getRecordVideoDir(): string {
+  const dataPath = app.getPath('userData');
+  return path.resolve(dataPath, 'record_video');
+}
+
+export { getRecordVideoDir, log, runTask };

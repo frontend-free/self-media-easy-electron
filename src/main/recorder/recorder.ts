@@ -6,6 +6,7 @@ import { getRoomInfo, GetRoomInfoResult } from './douyin';
 import { ffmpegOutputOptions, getFfmpegPath, inputOptionsArgs } from './helper';
 
 type CheckAndRecordResult = {
+  error?: string;
   roomId: string;
   outputDir: string;
   fileName?: string;
@@ -13,10 +14,6 @@ type CheckAndRecordResult = {
   roomInfo?: GetRoomInfoResult;
   stop: () => void;
 };
-
-function initFfmpeg(): void {
-  ffmpeg.setFfmpegPath(getFfmpegPath());
-}
 
 async function checkAndRecord(
   params: {
@@ -34,9 +31,6 @@ async function checkAndRecord(
   const { roomId, outputDir, fileName } = params;
   console.log('checkAndRecord', params);
 
-  // 初始化
-  initFfmpeg();
-
   const output = path.resolve(
     outputDir,
     fileName || `${roomId}_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.mp4`,
@@ -45,6 +39,7 @@ async function checkAndRecord(
 
   let roomInfo: CheckAndRecordResult['roomInfo'] = undefined;
   const result: CheckAndRecordResult = {
+    error: undefined,
     roomId,
     outputDir,
     fileName,
@@ -57,6 +52,16 @@ async function checkAndRecord(
     },
   };
 
+  const ffmpegPath = getFfmpegPath();
+  // 如果 ffmpeg 不存在，则返回
+  if (!fse.existsSync(ffmpegPath)) {
+    result.error = 'ffmpeg not found';
+    return result;
+  }
+
+  // 初始化路径
+  ffmpeg.setFfmpegPath(ffmpegPath);
+
   try {
     // 获取房间信息
     roomInfo = await getRoomInfo({ roomId });
@@ -68,13 +73,13 @@ async function checkAndRecord(
 
   // 失败了
   if (!roomInfo) {
+    result.error = 'getRoomInfo error';
     return result;
   }
 
   // 没有直播，返回数据
   if (!roomInfo.isLiving) {
-    console.log('room is not living');
-
+    result.error = 'room is not living';
     return result;
   }
 

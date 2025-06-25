@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { log, runTask } from '../helper';
+import { getRecordVideoDir, log, runTask } from '../helper';
 import { EnumCode, EnumPlatform, PlatformAuthCheckParams, PlatformAuthCheckResult } from '../types';
 
 async function authCheckTiktok(params: PlatformAuthCheckParams): Promise<PlatformAuthCheckResult> {
@@ -20,7 +20,7 @@ async function authCheckTiktok(params: PlatformAuthCheckParams): Promise<Platfor
     // 创建一个干净的上下文
     const context = await browser.newContext({
       recordVideo: {
-        dir: 'record_video',
+        dir: getRecordVideoDir(),
       },
     });
 

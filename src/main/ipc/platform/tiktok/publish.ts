@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { log, runTask } from '../helper';
+import { getRecordVideoDir, log, runTask } from '../helper';
 import { EnumCode, EnumPlatform, PlatformPublishParams, PlatformPublishResult } from '../types';
 
 async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPublishResult> {
@@ -19,7 +19,7 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
     // 创建一个干净的上下文
     const context = await browser.newContext({
       recordVideo: {
-        dir: 'record_video',
+        dir: getRecordVideoDir(),
       },
     });
 

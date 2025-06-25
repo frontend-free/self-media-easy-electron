@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { log, runTask } from '../helper';
+import { getRecordVideoDir, log, runTask } from '../helper';
 import { EnumCode, EnumPlatform, PlatformAuthCheckParams, PlatformAuthCheckResult } from '../types';
 
 async function authCheckWeixinVideo(
@@ -22,7 +22,7 @@ async function authCheckWeixinVideo(
     // 创建一个干净的上下文
     const context = await browser.newContext({
       recordVideo: {
-        dir: 'record_video',
+        dir: getRecordVideoDir(),
       },
     });
 

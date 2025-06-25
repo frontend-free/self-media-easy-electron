@@ -4,7 +4,7 @@ import is from 'electron-is';
 import fse from 'fs-extra';
 import http from 'http';
 import { promisify } from 'util';
-import { getFfmpegPath } from '../recorder/helper';
+import { getFfmpegDir, getFfmpegPath, getZipFilePath } from '../recorder/helper';
 const execAsync = promisify(exec);
 
 function getDownloadUrl(): string {
@@ -26,7 +26,7 @@ async function download({ url, filePath }: { url: string; filePath: string }): P
         });
       })
       .on('error', (err) => {
-        fse.unlink('./ffmpeg.zip', () => reject(err)); // 删除无效文件
+        fse.unlink(filePath, () => reject(err)); // 删除无效文件
         reject(err);
       });
   });
@@ -42,14 +42,21 @@ const ipcMainApiOfFfmpeg = {
   installFfmpeg: async (): Promise<void> => {
     const url = getDownloadUrl();
 
-    await download({ url, filePath: './ffmpeg.zip' });
+    const dir = getFfmpegDir();
+    fse.ensureDirSync(dir);
 
+    const zipFilePath = getZipFilePath();
+
+    console.log('download', url, zipFilePath);
+    await download({ url, filePath: zipFilePath });
+
+    console.log('zip');
     if (is.macOS()) {
-      await execAsync('unzip -o ./ffmpeg.zip -d ./ffmpeg/');
+      await execAsync(`unzip -o "${zipFilePath}" -d "${dir}"`);
     } else {
       const zip = new AdmZip('./ffmpeg.zip');
 
-      zip.extractAllTo('./ffmpeg/', true);
+      zip.extractAllTo(dir, true);
     }
   },
 };

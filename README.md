@@ -12,3 +12,8 @@ pnpm dev
 ```bash
 pnpm build:win
 ```
+
+## 一些信息
+
+C:\Users\<用户名>\AppData\Roaming\<应用名>
+/Users/<用户名>/Library/Application Support/<应用名>
