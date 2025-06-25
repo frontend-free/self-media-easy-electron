@@ -5,7 +5,7 @@ import { EnumCode, EnumPlatform, PlatformAuthParams, type PlatformAuthResult } f
 async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResult> {
   const { isDebug } = params;
 
-  const data: Partial<PlatformAuthResult['data']> = {
+  const data: Partial<PlatformAuthResult> = {
     platform: EnumPlatform.TIKTOK,
     platformName: undefined,
     platformAvatar: undefined,
@@ -100,11 +100,7 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
       });
     }
 
-    return {
-      success: true,
-      data: data as PlatformAuthResult['data'],
-      message: '授权成功',
-    };
+    return data as PlatformAuthResult;
   } catch (error) {
     console.error(error);
 
@@ -123,11 +119,11 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
 
     log(message, data.logs);
 
-    return {
-      success: false,
-      data: data as PlatformAuthResult['data'],
-      message,
-    };
+    const err = new Error(message);
+    // @ts-ignore 添加 details 属性
+    err.details = data;
+
+    throw err;
   }
 }
 

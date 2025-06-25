@@ -7,7 +7,7 @@ async function authCheckWeixinVideo(
 ): Promise<PlatformAuthCheckResult> {
   const { authInfo, isDebug } = params;
 
-  const data: Partial<PlatformAuthCheckResult['data']> = {
+  const data: Partial<PlatformAuthCheckResult> = {
     platform: EnumPlatform.WEIXIN_VIDEO,
     logs: [],
   };
@@ -79,11 +79,15 @@ async function authCheckWeixinVideo(
       });
     }
 
-    return {
-      success,
-      data: data as PlatformAuthCheckResult['data'],
-      message: '授权检查成功',
-    };
+    if (success) {
+      return data as PlatformAuthCheckResult;
+    } else {
+      const err = new Error('授权信息无效');
+      // @ts-ignore 添加 details 属性
+      err.details = data;
+
+      throw err;
+    }
   } catch (error) {
     console.error(error);
 
@@ -102,11 +106,11 @@ async function authCheckWeixinVideo(
 
     log(message, data.logs);
 
-    return {
-      success: false,
-      data: data as PlatformAuthCheckResult['data'],
-      message,
-    };
+    const err = new Error(message);
+    // @ts-ignore 添加 details 属性
+    err.details = data;
+
+    throw err;
   }
 }
 

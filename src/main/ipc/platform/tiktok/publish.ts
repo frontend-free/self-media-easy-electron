@@ -5,7 +5,7 @@ import { EnumCode, EnumPlatform, PlatformPublishParams, PlatformPublishResult } 
 async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPublishResult> {
   const { title, resourceOfVideo, authInfo, isDebug } = params;
 
-  const data: Partial<PlatformPublishResult['data']> = {
+  const data: Partial<PlatformPublishResult> = {
     platform: EnumPlatform.TIKTOK,
     logs: [],
   };
@@ -92,7 +92,7 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       logs: data.logs,
       task: async () => {
         await page.waitForTimeout(2000);
-        const video = page.locator('[class^="player-video-"]');
+        const video = page.locator('[class^="phone-container-"] video');
         await video.waitFor({
           state: 'visible',
           timeout: 10 * 60 * 1000,
@@ -144,11 +144,7 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       });
     }
 
-    return {
-      success: true,
-      data: data as PlatformPublishResult['data'],
-      message: '发布成功',
-    };
+    return data as PlatformPublishResult;
   } catch (error) {
     console.error(error);
 
@@ -173,11 +169,11 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
 
     log(message, data.logs);
 
-    return {
-      success: false,
-      data: data as PlatformPublishResult['data'],
-      message,
-    };
+    const err = new Error(message);
+    // @ts-ignore 添加 details 属性
+    err.details = data;
+
+    throw err;
   }
 }
 

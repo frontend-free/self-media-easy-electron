@@ -5,7 +5,7 @@ import { EnumCode, EnumPlatform, PlatformPublishParams, PlatformPublishResult } 
 async function publishWeixinVideo(params: PlatformPublishParams): Promise<PlatformPublishResult> {
   const { title, resourceOfVideo, authInfo, isDebug } = params;
 
-  const data: Partial<PlatformPublishResult['data']> = {
+  const data: Partial<PlatformPublishResult> = {
     platform: EnumPlatform.WEIXIN_VIDEO,
     logs: [],
   };
@@ -141,11 +141,7 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
       });
     }
 
-    return {
-      success: true,
-      data: data as PlatformPublishResult['data'],
-      message: '发布成功',
-    };
+    return data as PlatformPublishResult;
   } catch (error) {
     console.error(error);
 
@@ -170,11 +166,11 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
 
     log(message, data.logs);
 
-    return {
-      success: false,
-      data: data as PlatformPublishResult['data'],
-      message,
-    };
+    const err = new Error(message);
+    // @ts-ignore 添加 details 属性
+    err.details = data;
+
+    throw err;
   }
 }
 

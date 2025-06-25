@@ -23,17 +23,13 @@ interface PlatformAuthParams {
 }
 
 interface PlatformAuthResult {
-  success: boolean;
-  data?: {
-    code: EnumCode;
-    platform: EnumPlatform;
-    platformName?: string;
-    platformAvatar?: string;
-    platformId?: string;
-    authInfo?: string;
-    logs?: string[];
-  };
-  message?: string;
+  code: EnumCode;
+  platform: EnumPlatform;
+  platformName?: string;
+  platformAvatar?: string;
+  platformId?: string;
+  authInfo?: string;
+  logs?: string[];
 }
 
 interface PlatformAuthCheckParams {
@@ -42,13 +38,9 @@ interface PlatformAuthCheckParams {
   isDebug?: boolean;
 }
 interface PlatformAuthCheckResult {
-  success: boolean;
-  data?: {
-    code: EnumCode;
-    platform: EnumPlatform;
-    logs?: string[];
-  };
-  message?: string;
+  code: EnumCode;
+  platform: EnumPlatform;
+  logs?: string[];
 }
 
 interface PlatformPublishParams {
@@ -62,13 +54,9 @@ interface PlatformPublishParams {
 }
 
 interface PlatformPublishResult {
-  success: boolean;
-  data?: {
-    code: EnumCode;
-    platform: EnumPlatform;
-    logs?: string[];
-  };
-  message?: string;
+  code: EnumCode;
+  platform: EnumPlatform;
+  logs?: string[];
 }
 
 export { EnumCode, EnumPlatform };
