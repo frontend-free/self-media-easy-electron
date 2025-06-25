@@ -101,20 +101,18 @@ async function handlePlatformPublish(
 }
 
 function initIpc(): void {
-  ipcMain.handle('ping', () => {
-    return 'pong';
-  });
-
-  // 获取版本号
-  ipcMain.handle('getVersion', () => {
-    return app.getVersion();
-  });
-
   ipcMain.handle('platformAuth', handlePlatformAuth);
   ipcMain.handle('platformAuthCheck', handlePlatformAuthCheck);
   ipcMain.handle('platformPublish', handlePlatformPublish);
 
   const ipcMainApi = {
+    ping: () => {
+      return 'pone';
+    },
+    // 获取版本号
+    getVersion: () => {
+      return app.getVersion();
+    },
     // 文件相关
     ...ipcMainApiOfFile,
     // record 相关

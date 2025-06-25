@@ -20,11 +20,11 @@ enum EnumRoomStatus {
 }
 
 enum EnumQuality {
-  // 标清 960x540
+  // 标清 540x960
   LD = 'ld',
-  // 蓝光 1280x720
+  // 超清 720x1280
   HD = 'hd',
-  // 高清 1920x720
+  // 高清 720x1920
   SD = 'sd',
 }
 
@@ -66,6 +66,7 @@ async function getRoomInfo({ roomId }: { roomId: string }): Promise<GetRoomInfoR
 
   // 不成功
   if (res.data.status_code !== 0) {
+    console.log(res.data);
     throw new Error(
       `API Error. code ${res.data.status_code}, msg ${res.data.data}, roomId ${roomId}`,
     );
