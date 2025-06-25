@@ -36,7 +36,7 @@ function initIpc(): void {
         const res = {
           success: true,
           data,
-          message: '成功',
+          message: '',
         };
 
         console.log(key, 'res', res);
