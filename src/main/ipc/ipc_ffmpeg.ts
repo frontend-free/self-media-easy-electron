@@ -54,7 +54,7 @@ const ipcMainApiOfFfmpeg = {
     if (is.macOS()) {
       await execAsync(`unzip -o "${zipFilePath}" -d "${dir}"`);
     } else {
-      const zip = new AdmZip('./ffmpeg.zip');
+      const zip = new AdmZip(zipFilePath);
 
       zip.extractAllTo(dir, true);
     }
