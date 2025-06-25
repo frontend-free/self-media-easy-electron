@@ -1,9 +1,8 @@
-import dayjs from 'dayjs';
 import ffmpeg from 'fluent-ffmpeg';
 import fse from 'fs-extra';
 import path from 'path';
 import { getRoomInfo, GetRoomInfoResult } from './douyin';
-import { ffmpegOutputOptions, getFfmpegPath, inputOptionsArgs } from './helper';
+import { ffmpegOutputOptions, getFfmpegPath, getNextFileName, inputOptionsArgs } from './helper';
 
 type CheckAndRecordResult = {
   error?: string;
@@ -31,10 +30,14 @@ async function checkAndRecord(
   const { roomId, outputDir, fileName } = params;
   console.log('checkAndRecord', params);
 
-  const output = path.resolve(
+  // 确保文件夹存在
+  fse.ensureDirSync(outputDir);
+
+  const nextFileName = await getNextFileName({
     outputDir,
-    fileName || `${roomId}_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.mp4`,
-  );
+    fileName: fileName || `${roomId}.mp4`,
+  });
+  const output = path.resolve(outputDir, nextFileName);
   console.log('output', output);
 
   let roomInfo: CheckAndRecordResult['roomInfo'] = undefined;
@@ -82,9 +85,6 @@ async function checkAndRecord(
     result.error = 'room is not living';
     return result;
   }
-
-  // 确保文件夹存在
-  fse.ensureDir(outputDir);
 
   const command = ffmpeg(roomInfo.stream)
     .inputOptions(...inputOptionsArgs)
