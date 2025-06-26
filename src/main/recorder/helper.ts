@@ -61,7 +61,7 @@ async function getNextFileName({
   // 读取目录下所有文件
   const files = await fse.readdir(outputDir).catch(() => []);
   // 匹配 baseName_数字.ext
-  const reg = new RegExp(`^${name}_(\\d+)${ext.replace('.', '.')}$`);
+  const reg = new RegExp(`^${name}_第(\\d+)集${ext.replace('.', '.')}$`);
   let maxIndex = 0;
   files.forEach((file) => {
     const match = file.match(reg);
