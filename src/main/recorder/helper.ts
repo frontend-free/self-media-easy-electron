@@ -70,7 +70,7 @@ async function getNextFileName({
       if (idx > maxIndex) maxIndex = idx;
     }
   });
-  return `${name}_${maxIndex + 1}${ext}`;
+  return `${name}第${maxIndex + 1}集${ext}`;
 }
 
 export {
