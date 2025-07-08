@@ -88,8 +88,7 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
 
   // 显示浏览器窗口
   const browser = await chromium.launch({
-    // h5Auth 的时候隐藏浏览器
-    headless: h5AuthId ? true : false,
+    headless: false,
     channel: 'chrome',
   });
 

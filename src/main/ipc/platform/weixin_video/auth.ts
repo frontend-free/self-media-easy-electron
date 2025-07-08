@@ -19,8 +19,8 @@ async function authWeixinVideo(params: PlatformAuthParams): Promise<PlatformAuth
 
   // 显示浏览器窗口
   const browser = await chromium.launch({
-    // h5Auth 的时候隐藏浏览器
-    headless: h5AuthId ? true : false,
+    // 视频号需要 false，否则很多功能正常工作。
+    headless: false,
     channel: 'chrome',
   });
 
