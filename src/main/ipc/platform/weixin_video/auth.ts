@@ -78,7 +78,7 @@ async function authWeixinVideo(params: PlatformAuthParams): Promise<PlatformAuth
           // 并且定时获取，二维码可能超时失效，需要重新获取
           timerQrcode = setInterval(() => {
             getQrcode();
-          }, 1000 * 5);
+          }, 1000 * 2);
         },
       });
     }
