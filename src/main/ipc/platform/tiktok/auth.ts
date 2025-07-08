@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 import { sendH5Auth, sendH5AuthMobileCode } from '../../send';
-import { getRecordVideoDir, log, runTask } from '../helper';
+import { log, runTask } from '../helper';
 import { EnumCode, EnumPlatform, PlatformAuthParams, type PlatformAuthResult } from '../types';
 
 async function getIsMobileCode({ page, data }): Promise<boolean> {
@@ -97,9 +97,9 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
   try {
     // 创建一个干净的上下文
     const context = await browser.newContext({
-      recordVideo: {
-        dir: getRecordVideoDir(),
-      },
+      // recordVideo: {
+      //   dir: getRecordVideoDir(),
+      // },
     });
     // 创建页面
     const page = await context.newPage();

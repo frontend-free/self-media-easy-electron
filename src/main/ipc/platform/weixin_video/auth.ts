@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 import { sendH5Auth } from '../../send';
-import { getRecordVideoDir, log, runTask } from '../helper';
+import { log, runTask } from '../helper';
 import { EnumCode, EnumPlatform, PlatformAuthParams, type PlatformAuthResult } from '../types';
 
 async function authWeixinVideo(params: PlatformAuthParams): Promise<PlatformAuthResult> {
@@ -29,9 +29,9 @@ async function authWeixinVideo(params: PlatformAuthParams): Promise<PlatformAuth
   try {
     // 创建一个干净的上下文
     const context = await browser.newContext({
-      recordVideo: {
-        dir: getRecordVideoDir(),
-      },
+      // recordVideo: {
+      //   dir: getRecordVideoDir(),
+      // },
     });
     // 创建页面
     const page = await context.newPage();
