@@ -14,6 +14,19 @@ function initIpc(): void {
     getVersion: () => {
       return app.getVersion();
     },
+    openAtLogin: (_, arg?: { open?: boolean }): void | { open: boolean } => {
+      // set
+      if (arg?.open !== undefined) {
+        app.setLoginItemSettings({
+          openAtLogin: arg.open,
+        });
+        return;
+      }
+
+      return {
+        open: app.getLoginItemSettings().openAtLogin,
+      };
+    },
     // 视频发布
     ...ipcMainApiOfMedia,
     // 文件相关
