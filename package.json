@@ -1,6 +1,6 @@
 {
   "name": "subject-media-electron",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "驾K先锋-多媒体工具",
   "main": "./out/main/index.js",
   "author": "驾K先锋",
