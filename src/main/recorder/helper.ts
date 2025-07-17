@@ -60,8 +60,8 @@ async function getNextFileName({
 
   // 读取目录下所有文件
   const files = await fse.readdir(outputDir).catch(() => []);
-  // 匹配 baseName_数字.ext
-  const reg = new RegExp(`^${name}第(\\d+)集${ext.replace('.', '.')}$`);
+  // 匹配 baseName 数字.ext
+  const reg = new RegExp(`^${name}+(\\d+)${ext.replace('.', '.')}$`);
   let maxIndex = 0;
   files.forEach((file) => {
     const match = file.match(reg);
@@ -70,7 +70,7 @@ async function getNextFileName({
       if (idx > maxIndex) maxIndex = idx;
     }
   });
-  return `${name}第${maxIndex + 1}集${ext}`;
+  return `${name}+${maxIndex + 1}${ext}`;
 }
 
 export {
