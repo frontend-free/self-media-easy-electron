@@ -52,10 +52,25 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
 
         // 等待结果
         await Promise.race([
-          // 如果还在当前页，则认为登录
-          page.waitForURL('https://creator.douyin.com/creator-micro/content/upload').then(() => {
-            log('授权信息有效', data.logs);
-          }),
+          // 如果存在此按钮，则认为登录
+          page
+            .locator('#douyin-creator-master-side-upload')
+            .waitFor({
+              state: 'visible',
+            })
+            .then(() => {
+              log('授权信息有效', data.logs);
+            }),
+          // 如果存在登录框，则认为授权信息失效
+          page
+            .locator('#douyin-login-new-id')
+            .waitFor({
+              state: 'visible',
+            })
+            .then(() => {
+              log('授权信息失效', data.logs);
+              throw new Error(EnumCode.ERROR_AUTH_INFO_INVALID);
+            }),
           // 如果跳转到了登录页，则认为授权信息失效
           page.waitForURL('https://creator.douyin.com/').then(() => {
             log('授权信息失效', data.logs);

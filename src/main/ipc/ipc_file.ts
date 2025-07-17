@@ -38,23 +38,17 @@ async function handleGetDirectoryVideoFiles(
   _,
   arg: {
     directory: string;
-    lastRunAt?: number;
   },
 ): Promise<{
   filePaths: string[];
 }> {
-  const { directory, lastRunAt } = arg;
+  const { directory } = arg;
 
   const files = await fse.readdir(directory);
 
   const newFiles = files.filter((file) => {
     const stat = fse.statSync(path.join(directory, file));
-    return (
-      stat.isFile() &&
-      VIDEO_EXTENSIONS.includes(file.split('.').pop() || '') &&
-      // 过滤 创建时间 > lastRunAt 的文件
-      stat.birthtime.getTime() > (lastRunAt || 0)
-    );
+    return stat.isFile() && VIDEO_EXTENSIONS.includes(file.split('.').pop() || '');
   });
 
   const filePaths = newFiles.map((file) => path.join(directory, file));
