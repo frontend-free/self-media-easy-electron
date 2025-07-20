@@ -6,12 +6,13 @@ import { initIpc } from './ipc';
 
 const isDev = import.meta.env.MODE === 'development';
 
-function createWindow(): void {
+function createWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 900,
+    width: 1300,
+    height: 1000,
     show: false,
     autoHideMenuBar: true,
+    frame: false,
     ...(process.platform === 'linux' ? { icon } : {}),
 
     webPreferences: {
@@ -36,6 +37,8 @@ function createWindow(): void {
       mode: 'detach',
     });
   }
+
+  return mainWindow;
 }
 
 // This method will be called when Electron has finished
@@ -49,12 +52,9 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window);
   });
 
-  // IPC test
-
+  const mainWindow = createWindow();
   // IPC init
-  initIpc();
-
-  createWindow();
+  initIpc({ mainWindow });
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
