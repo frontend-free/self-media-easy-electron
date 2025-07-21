@@ -1,14 +1,30 @@
 import { chromium } from 'playwright';
-import { log, runTask } from '../helper';
+import { log, processVideoStick, runTask } from '../helper';
 import { EnumCode, EnumPlatform, PlatformPublishParams, PlatformPublishResult } from '../types';
 
 async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPublishResult> {
-  const { title, resourceOfVideo, authInfo, isDebug } = params;
+  const { title, resourceOfVideo: originalResourceOfVideo, adText, authInfo, isDebug } = params;
 
   const data: Partial<PlatformPublishResult> = {
     platform: EnumPlatform.TIKTOK,
     logs: [],
   };
+
+  let resourceOfVideo = originalResourceOfVideo;
+
+  if (adText) {
+    await runTask({
+      name: '处理文案',
+      logs: data.logs,
+      task: async () => {
+        log(`文案: ${adText}`, data.logs);
+        resourceOfVideo = await processVideoStick({
+          input: resourceOfVideo,
+          adText,
+        });
+      },
+    });
+  }
 
   const browser = await chromium.launch({
     headless: false,

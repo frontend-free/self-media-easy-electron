@@ -50,6 +50,7 @@ interface PlatformPublishParams {
   resourceOfVideo: string;
   title?: string;
   description?: string;
+  adText?: string;
   publishType?: EnumPublishType;
   isDebug?: boolean;
 }

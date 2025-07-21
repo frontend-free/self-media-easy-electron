@@ -2,7 +2,16 @@ import ffmpeg from 'fluent-ffmpeg';
 import path from 'path';
 import { getFfmpegPath } from '../recorder/helper';
 
-function videoStick({
+function getFontPath(): string {
+  // 开发环境
+  if (process.env.NODE_ENV === 'development') {
+    return path.resolve(__dirname, '../../resources/fonts/SourceHanSansSC-Medium-2.otf');
+  }
+  // 生产环境（打包后）
+  return path.resolve(__dirname, './resources/fonts/SourceHanSansSC-Medium-2.otf');
+}
+
+async function videoStick({
   input,
   output,
   texts,
@@ -14,15 +23,17 @@ function videoStick({
   const ffmpegPath = getFfmpegPath();
   ffmpeg.setFfmpegPath(ffmpegPath);
 
-  const top = 50;
+  const top = 80;
+  const left = 20;
+  const fontSize = 30;
   function getOptions(index: number): object {
     return {
-      x: '(w-text_w)/2', // 水平居中
-      y: top + index * (50 + 20),
-      fontfile: path.resolve(desktopPath, './SourceHanSansSC-Medium-2.otf'),
-      fontsize: index <= 1 ? 50 : 30,
-      fontcolor: index === 0 ? 'yellow' : 'white',
-      borderw: 2,
+      x: left,
+      y: top + index * (fontSize + 10),
+      fontfile: getFontPath(),
+      fontsize: fontSize,
+      fontcolor: 'white',
+      borderw: 1,
       bordercolor: 'black',
     };
   }
@@ -50,12 +61,5 @@ function videoStick({
       .save(output);
   });
 }
-
-const desktopPath = '/Users/liyatang/Desktop/test';
-videoStick({
-  input: path.resolve(desktopPath, './test.mp4'),
-  output: path.resolve(desktopPath, './output.mp4'),
-  texts: ['深港驾校', '12344457876', '深圳市宝安区留仙二路'],
-});
 
 export { videoStick };
