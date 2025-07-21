@@ -1,15 +1,5 @@
 import ffmpeg from 'fluent-ffmpeg';
-import path from 'path';
 import { getFfmpegPath } from '../recorder/helper';
-
-function getFontPath(): string {
-  // 开发环境
-  if (process.env.NODE_ENV === 'development') {
-    return path.resolve(__dirname, '../../resources/fonts/SourceHanSansSC-Medium-2.otf');
-  }
-  // 生产环境（打包后）
-  return path.resolve(process.resourcesPath, 'fonts/SourceHanSansSC-Medium-2.otf');
-}
 
 async function videoStick({
   input,
@@ -30,7 +20,7 @@ async function videoStick({
     return {
       x: left,
       y: top + index * (fontSize + 10),
-      fontfile: getFontPath(),
+      fontfile: 'simhei',
       fontsize: fontSize,
       fontcolor: 'white',
       borderw: 1,
