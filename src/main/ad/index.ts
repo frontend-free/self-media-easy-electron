@@ -8,7 +8,7 @@ function getFontPath(): string {
     return path.resolve(__dirname, '../../resources/fonts/SourceHanSansSC-Medium-2.otf');
   }
   // 生产环境（打包后）
-  return path.resolve(__dirname, './resources/fonts/SourceHanSansSC-Medium-2.otf');
+  return path.resolve(process.resourcesPath, 'fonts/SourceHanSansSC-Medium-2.otf');
 }
 
 async function videoStick({

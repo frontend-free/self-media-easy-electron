@@ -9,9 +9,9 @@ const execAsync = promisify(exec);
 
 function getDownloadUrl(): string {
   if (is.macOS()) {
-    return 'http://47.105.58.181:3001/ffmpeg/ffmpeg-7.1.1.zip';
+    return 'https://live-app.sanljt.cn/ffmpeg/ffmpeg-7.1.1.zip';
   }
-  return 'http://47.105.58.181:3001/ffmpeg/ffmpeg-master-latest-win64-gpl-shared.zip';
+  return 'https://live-app.sanljt.cn/ffmpeg/ffmpeg-master-latest-win64-gpl-shared.zip';
 }
 
 async function download({ url, filePath }: { url: string; filePath: string }): Promise<void> {

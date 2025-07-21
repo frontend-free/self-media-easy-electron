@@ -12,28 +12,30 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
 
   let resourceOfVideo = originalResourceOfVideo;
 
-  if (adText) {
-    await runTask({
-      name: '处理文案',
-      logs: data.logs,
-      task: async () => {
-        log(`文案: ${adText}`, data.logs);
-        resourceOfVideo = await processVideoStick({
-          input: resourceOfVideo,
-          adText,
-        });
-      },
-    });
-  }
-
-  const browser = await chromium.launch({
-    // 特殊处理，true 就跑不通。
-    headless: false,
-    // 视频号需要使用 chrome，否则无法识别视频。 更多见 https://sap-doc.nasdaddy.com/docs/tutorial-basics/platform-channels/
-    channel: 'chrome',
-  });
+  let browser;
 
   try {
+    if (adText) {
+      await runTask({
+        name: '处理文案',
+        logs: data.logs,
+        task: async () => {
+          log(`文案: ${adText}`, data.logs);
+          resourceOfVideo = await processVideoStick({
+            input: resourceOfVideo,
+            adText,
+          });
+        },
+      });
+    }
+
+    browser = await chromium.launch({
+      // 特殊处理，true 就跑不通。
+      headless: false,
+      // 视频号需要使用 chrome，否则无法识别视频。 更多见 https://sap-doc.nasdaddy.com/docs/tutorial-basics/platform-channels/
+      channel: 'chrome',
+    });
+
     // 创建一个干净的上下文
     const context = await browser.newContext({
       // recordVideo: {
@@ -163,7 +165,7 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
 
     if (!isDebug) {
       // 关闭弹窗
-      await browser.close();
+      await browser?.close();
     }
 
     let message = `发布视频过程中发生错误: ${error}`;
