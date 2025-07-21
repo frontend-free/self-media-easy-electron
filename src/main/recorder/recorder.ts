@@ -34,7 +34,6 @@ async function checkAndRecord(
   fse.ensureDirSync(outputDir);
 
   const nextFileName = await getNextFileName({
-    outputDir,
     fileName: fileName || `${roomId}.mp4`,
   });
   const output = path.resolve(outputDir, nextFileName);

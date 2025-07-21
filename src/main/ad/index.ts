@@ -13,32 +13,42 @@ async function videoStick({
   const ffmpegPath = getFfmpegPath();
   ffmpeg.setFfmpegPath(ffmpegPath);
 
-  const top = 80;
   const left = 20;
   const fontSize = 30;
   function getOptions(index: number): object {
     return {
       x: left,
-      y: top + index * (fontSize + 10),
+      y: `(h-th)/2-70+${index * (fontSize + 10)}`,
       fontfile: 'simhei',
       fontsize: fontSize,
-      fontcolor: 'white',
-      borderw: 1,
-      bordercolor: 'black',
+      fontcolor: '#FFFFFF@0.7',
+      // borderw: 1,
+      // bordercolor: 'black',
     };
   }
 
+  const logoFilter = {
+    filter: 'drawtext',
+    options: {
+      x: `w-tw-10`,
+      y: `h-th-80`,
+      fontfile: 'simhei',
+      fontsize: 30,
+      fontcolor: '#FFFFFF@0.8',
+      text: '驾K先锋',
+    },
+  };
+
   return new Promise((resolve, reject) => {
+    const filters = texts.map((text, index) => ({
+      filter: 'drawtext',
+      options: {
+        ...getOptions(index),
+        text,
+      },
+    }));
     ffmpeg(input)
-      .videoFilters(
-        texts.map((text, index) => ({
-          filter: 'drawtext',
-          options: {
-            ...getOptions(index),
-            text,
-          },
-        })),
-      )
+      .videoFilters([...filters, logoFilter])
       .on('start', (commandLine) => console.log(`videoStick start: ${commandLine}`))
       .on('end', () => {
         console.log('videoStick end');
