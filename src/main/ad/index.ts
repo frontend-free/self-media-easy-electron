@@ -31,7 +31,7 @@ async function videoStick({
     filter: 'drawtext',
     options: {
       x: `w-tw-10`,
-      y: `h-th-80`,
+      y: `100`,
       fontfile: 'simhei',
       fontsize: 30,
       fontcolor: '#FFFFFF@0.8',
