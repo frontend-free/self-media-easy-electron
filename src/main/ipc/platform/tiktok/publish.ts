@@ -65,7 +65,7 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       logs: data.logs,
       task: async () => {
         // 等待
-        await page.waitForTimeout(2000);
+        await page.waitForTimeout(5000);
 
         // 等待结果
         await Promise.race([
@@ -123,7 +123,7 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       name: '等待视频上传完成',
       logs: data.logs,
       task: async () => {
-        await page.waitForTimeout(2000);
+        await page.waitForTimeout(5000);
         const video = page.locator('[class^="phone-container-"] video');
         await video.waitFor({
           state: 'visible',
@@ -146,7 +146,7 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       logs: data.logs,
       task: async () => {
         // 需要等待一下，等表单处理好
-        await page.waitForTimeout(2000);
+        await page.waitForTimeout(5000);
 
         const publishButton = page.locator('button:text("发布")');
         await publishButton.waitFor({

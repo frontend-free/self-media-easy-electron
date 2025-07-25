@@ -13,7 +13,7 @@ async function videoStick({
   const ffmpegPath = getFfmpegPath();
   ffmpeg.setFfmpegPath(ffmpegPath);
 
-  const left = 20;
+  const left = 60;
   const fontSize = 30;
   function getOptions(index: number): object {
     return {
@@ -21,9 +21,9 @@ async function videoStick({
       y: `(h-th)/2-70+${index * (fontSize + 10)}`,
       fontfile: 'simhei',
       fontsize: fontSize,
-      fontcolor: '#FFFFFF@0.7',
-      // borderw: 1,
-      // bordercolor: 'black',
+      fontcolor: 'yellow@0.7',
+      borderw: 1,
+      bordercolor: 'black@0.7',
     };
   }
 

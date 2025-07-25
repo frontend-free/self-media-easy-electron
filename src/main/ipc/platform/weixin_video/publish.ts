@@ -68,7 +68,7 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
       logs: data.logs,
       task: async () => {
         // 等待
-        await page.waitForTimeout(2000);
+        await page.waitForTimeout(5000);
 
         // 等待结果
         await Promise.race([
@@ -131,7 +131,7 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
       logs: data.logs,
       task: async () => {
         // 需要等待一下，等表单处理好
-        await page.waitForTimeout(2000);
+        await page.waitForTimeout(5000);
 
         const publishButton = page.locator('button.weui-desktop-btn_primary:text-is("发表")');
         await publishButton.waitFor({
