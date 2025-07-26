@@ -2,7 +2,7 @@ import AdmZip from 'adm-zip';
 import { exec } from 'child_process';
 import is from 'electron-is';
 import fse from 'fs-extra';
-import http from 'http';
+import https from 'https';
 import { promisify } from 'util';
 import { getFfmpegDir, getFfmpegPath, getZipFilePath } from '../recorder/helper';
 const execAsync = promisify(exec);
@@ -17,7 +17,7 @@ function getDownloadUrl(): string {
 async function download({ url, filePath }: { url: string; filePath: string }): Promise<void> {
   return new Promise((resolve, reject) => {
     const file = fse.createWriteStream(filePath);
-    http
+    https
       .get(url, (response) => {
         response.pipe(file);
         file.on('finish', () => {
