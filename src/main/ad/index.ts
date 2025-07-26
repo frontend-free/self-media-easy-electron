@@ -13,12 +13,11 @@ async function videoStick({
   const ffmpegPath = getFfmpegPath();
   ffmpeg.setFfmpegPath(ffmpegPath);
 
-  const left = 60;
   const fontSize = 30;
   function getOptions(index: number): object {
     return {
-      x: left,
-      y: `(h-th)/2-70+${index * (fontSize + 10)}`,
+      x: `(w-tw)/2`,
+      y: `100+${index * (fontSize + 10)}`,
       fontfile: 'simhei',
       fontsize: fontSize,
       fontcolor: 'yellow@0.7',
@@ -30,8 +29,8 @@ async function videoStick({
   const logoFilter = {
     filter: 'drawtext',
     options: {
-      x: `w-tw-10`,
-      y: `100`,
+      x: `w-tw-70`,
+      y: `h-th-100`,
       fontfile: 'simhei',
       fontsize: 30,
       fontcolor: '#FFFFFF@0.8',
