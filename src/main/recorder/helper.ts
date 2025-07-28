@@ -11,8 +11,11 @@ const ffmpegOutputOptions: string[] = [
   '-f segment',
   '-segment_format mp4',
   `-segment_time ${5 * 60}`,
-  '-movflags +frag_keyframe+empty_moov',
+  '-reset_timestamps 1',
+  '-avoid_negative_ts make_zero',
+  '-fflags +genpts',
 ];
+
 const inputOptionsArgs = [
   '-user_agent',
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36',
