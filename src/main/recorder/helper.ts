@@ -1,6 +1,6 @@
-import dayjs from 'dayjs';
 import { app } from 'electron';
 import is from 'electron-is';
+import fse from 'fs-extra';
 import path from 'path';
 
 const ffmpegOutputOptions: string[] = [
@@ -52,12 +52,31 @@ function getZipFilePath(): string {
 /**
  * 获取下一个可用的递增文件名，如 fileName_1.mp4、fileName_2.mp4
  */
-async function getNextFileName({ fileName }: { fileName: string }): Promise<string> {
+async function getNextFileName({
+  outputDir,
+  fileName,
+}: {
+  outputDir: string;
+  fileName: string;
+}): Promise<string> {
   const parsed = path.parse(fileName);
   const name = parsed.name;
   const ext = parsed.ext || '.mp4';
 
-  return `${name}+${dayjs().format('SSS')}+%d${ext}`;
+  // 读取目录下所有文件
+  const files = await fse.readdir(outputDir).catch(() => []);
+
+  // 匹配 baseName第N集数字.ext
+  const reg = new RegExp(`^${name}第(\\d+)集\\d+${ext.replace('.', '.')}$`);
+  let maxIndex = 0;
+  files.forEach((file) => {
+    const match = file.match(reg);
+    if (match) {
+      const idx = parseInt(match[1], 10);
+      if (idx > maxIndex) maxIndex = idx;
+    }
+  });
+  return `${name}第${maxIndex + 1}集%d${ext}`;
 }
 
 export {
