@@ -132,12 +132,34 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       },
     });
 
+    if (title) {
+      await runTask({
+        name: '填写标题',
+        logs: data.logs,
+        task: async () => {
+          const titleInput = page.locator('input[class^="semi-input"]');
+          await titleInput.first().fill(title || '');
+        },
+      });
+    }
+
+    // 有些抖音账号 选择封面 必填。
     await runTask({
-      name: '填写标题',
+      name: '选择封面',
       logs: data.logs,
       task: async () => {
-        const titleInput = page.locator('input[class^="semi-input"]');
-        await titleInput.first().fill(title || '');
+        // 点击选择封面
+        const coverInput = page.locator('.content-upload-new div:text("选择封面")');
+        await coverInput.first().click();
+
+        // 需要等待一下
+        await page.waitForTimeout(5000);
+
+        const finishButton = page.locator('button.semi-button .semi-button-content:text("完成")');
+        await finishButton.waitFor({
+          state: 'visible',
+        });
+        await finishButton.click();
       },
     });
 
