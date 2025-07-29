@@ -155,7 +155,9 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
         // 需要等待一下
         await page.waitForTimeout(5000);
 
-        const finishButton = page.locator('button.semi-button .semi-button-content:text("完成")');
+        const finishButton = page.locator(
+          '#tooltip-container button.semi-button .semi-button-content:text("完成")',
+        );
         await finishButton.waitFor({
           state: 'visible',
         });
