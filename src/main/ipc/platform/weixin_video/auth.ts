@@ -1,10 +1,9 @@
 import { chromium } from 'playwright';
-import { sendH5Auth } from '../../send';
 import { log, runTask } from '../helper';
 import { EnumCode, EnumPlatform, PlatformAuthParams, type PlatformAuthResult } from '../types';
 
 async function authWeixinVideo(params: PlatformAuthParams): Promise<PlatformAuthResult> {
-  const { isDebug, h5AuthId } = params;
+  const { isDebug } = params;
 
   const data: Partial<PlatformAuthResult> = {
     platform: EnumPlatform.WEIXIN_VIDEO,
@@ -24,7 +23,7 @@ async function authWeixinVideo(params: PlatformAuthParams): Promise<PlatformAuth
     channel: 'chrome',
   });
 
-  let timerQrcode: NodeJS.Timeout | null = null;
+  const timerQrcode: NodeJS.Timeout | null = null;
 
   try {
     // 创建一个干净的上下文
@@ -43,45 +42,6 @@ async function authWeixinVideo(params: PlatformAuthParams): Promise<PlatformAuth
       },
       logs: data.logs,
     });
-
-    if (h5AuthId) {
-      await runTask({
-        name: '获取二维码',
-        logs: data.logs,
-        task: async () => {
-          // 等待页面加载
-          await page.waitForTimeout(2000);
-
-          let lastQrcodeSrc: string | null = null;
-          async function getQrcode(): Promise<void> {
-            const qrcode = page.frameLocator('iframe').locator('[class^="qrcode-wrap"] img.qrcode');
-            await qrcode.waitFor({
-              state: 'visible',
-            });
-            const qrcodeSrc = await qrcode.getAttribute('src');
-
-            // 有变化才发送，避免重复发送
-            if (qrcodeSrc !== lastQrcodeSrc) {
-              log(`获取到二维码: ${qrcodeSrc}`, data.logs);
-
-              lastQrcodeSrc = qrcodeSrc;
-
-              sendH5Auth({
-                type: 'QRCODE',
-                data: { h5AuthId: h5AuthId!, qrcode: qrcodeSrc ?? '' },
-              });
-            }
-          }
-
-          await getQrcode();
-
-          // 并且定时获取，二维码可能超时失效，需要重新获取
-          timerQrcode = setInterval(() => {
-            getQrcode();
-          }, 1000 * 2);
-        },
-      });
-    }
 
     await runTask({
       name: '等待授权成功',

@@ -19,7 +19,6 @@ enum EnumCode {
 
 interface PlatformAuthParams {
   platform: EnumPlatform;
-  h5AuthId?: string;
   isDebug?: boolean;
 }
 

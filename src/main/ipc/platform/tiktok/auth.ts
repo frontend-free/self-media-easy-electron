@@ -1,79 +1,9 @@
 import { chromium } from 'playwright';
-import { sendH5Auth, sendH5AuthMobileCode } from '../../send';
 import { log, runTask } from '../helper';
 import { EnumCode, EnumPlatform, PlatformAuthParams, type PlatformAuthResult } from '../types';
 
-async function getIsMobileCode({ page, data }): Promise<boolean> {
-  let isMobileCode = false;
-
-  await Promise.race([
-    (async () => {
-      log('等待二次验证弹窗出现', data.logs);
-      const btn = page.locator('#uc-second-verify div:text-is("接收短信验证码")');
-      await btn.waitFor({
-        state: 'visible',
-        // 5分钟超时
-        timeout: 5 * 60 * 1000,
-      });
-      log('二次验证弹窗出现', data.logs);
-      isMobileCode = true;
-    })(),
-    (async () => {
-      log('等待授权成功出现', data.logs);
-      await page.waitForURL('https://creator.douyin.com/creator-micro/home', {
-        // 5分钟超时
-        timeout: 5 * 60 * 1000,
-      });
-      log('授权成功出现', data.logs);
-      isMobileCode = false;
-    })(),
-  ]);
-
-  return isMobileCode;
-}
-
-async function doMobileCode({ data, page, h5AuthId }): Promise<void> {
-  await runTask({
-    name: '手机验证码',
-    logs: data.logs,
-    task: async () => {
-      log('点击使用手机验证码', data.logs);
-      const btnUseMobileCode = page.locator('#uc-second-verify div:text-is("接收短信验证码")');
-      await btnUseMobileCode.waitFor({
-        state: 'visible',
-      });
-      await btnUseMobileCode.click();
-
-      log('设置H5状态为获取手机验证码', data.logs);
-      sendH5Auth({
-        type: 'MOBILE_CODE',
-        data: { h5AuthId },
-      });
-
-      log('等待手机验证码', data.logs);
-      const { mobileCode } = await sendH5AuthMobileCode({
-        h5AuthId,
-      });
-
-      log(`输入手机验证码: ${mobileCode}`, data.logs);
-      const input = page.locator('#uc-second-verify input[placeholder="请输入验证码"]');
-      await input.waitFor({
-        state: 'visible',
-      });
-      await input.fill(mobileCode);
-
-      log('点击验证', data.logs);
-      const btnVerify = page.locator('#uc-second-verify div:text-is("验证")');
-      await btnVerify.waitFor({
-        state: 'visible',
-      });
-      await btnVerify.click();
-    },
-  });
-}
-
 async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResult> {
-  const { isDebug, h5AuthId } = params;
+  const { isDebug } = params;
 
   const data: Partial<PlatformAuthResult> = {
     platform: EnumPlatform.TIKTOK,
@@ -92,7 +22,7 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
     channel: 'chrome',
   });
 
-  let timerQrcode: NodeJS.Timeout | null = null;
+  const timerQrcode: NodeJS.Timeout | null = null;
 
   try {
     // 创建一个干净的上下文
@@ -111,53 +41,6 @@ async function authTiktok(params: PlatformAuthParams): Promise<PlatformAuthResul
       },
       logs: data.logs,
     });
-
-    // h5 授权情况下获取二维码
-    if (h5AuthId) {
-      await runTask({
-        name: '获取二维码',
-        logs: data.logs,
-        task: async () => {
-          let lastQrcodeSrc: string | null = null;
-          async function getQrcode(): Promise<void> {
-            const qrcode = page.locator('[class^="qrcode_img"]');
-            await qrcode.waitFor({
-              state: 'visible',
-            });
-            const qrcodeSrc = await qrcode.getAttribute('src');
-
-            // 有变化才发送，避免重复发送
-            if (qrcodeSrc !== lastQrcodeSrc) {
-              log(`获取到二维码: ${qrcodeSrc}`, data.logs);
-
-              lastQrcodeSrc = qrcodeSrc;
-
-              sendH5Auth({
-                type: 'QRCODE',
-                data: { h5AuthId: h5AuthId!, qrcode: qrcodeSrc ?? '' },
-              });
-            }
-          }
-
-          await getQrcode();
-
-          // 并且定时获取，二维码可能超时失效，需要重新获取
-          timerQrcode = setInterval(() => {
-            getQrcode();
-          }, 1000 * 2);
-        },
-      });
-    }
-
-    // h5 授权
-    if (h5AuthId) {
-      // 如果走到手机验证码，则处理验证码逻辑
-      const isMobileCode = await getIsMobileCode({ page, data });
-      if (isMobileCode) {
-        log('走到手机验证码', data.logs);
-        await doMobileCode({ data, page, h5AuthId });
-      }
-    }
 
     await runTask({
       name: '等待授权成功',
