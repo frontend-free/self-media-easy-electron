@@ -1,10 +1,10 @@
 {
-  "name": "subject-media-electron",
+  "name": "video-publish-record-electron",
   "version": "1.3.13",
-  "description": "驾K先锋-多媒体工具",
+  "description": "短视频工具",
   "main": "./out/main/index.js",
-  "author": "驾K先锋",
-  "homepage": "https://electron-vite.org",
+  "author": "liyatang",
+  "homepage": "https://github.com/liyatang/video-publish-record-electron",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",

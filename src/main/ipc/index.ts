@@ -1,11 +1,10 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, ipcMain } from 'electron';
 import { ipcMainApiOfFfmpeg } from './ipc_ffmpeg';
 import { ipcMainApiOfFile } from './ipc_file';
 import { ipcMainApiOfMedia } from './ipc_media';
-import { ipcMainApiOfPlaywright } from './ipc_playwright';
 import { ipcMainApiOfRecorder } from './ipc_record';
 
-function initIpc({ mainWindow }: { mainWindow: BrowserWindow }): void {
+function initIpc(): void {
   const ipcMainApi = {
     ping: () => {
       return 'pone';
@@ -27,20 +26,12 @@ function initIpc({ mainWindow }: { mainWindow: BrowserWindow }): void {
         open: app.getLoginItemSettings().openAtLogin,
       };
     },
-    minimizeWindow: () => {
-      mainWindow.minimize();
-    },
-    closeWindow: () => {
-      mainWindow.close();
-    },
     // 视频发布
     ...ipcMainApiOfMedia,
     // 文件相关
     ...ipcMainApiOfFile,
     // record 相关
     ...ipcMainApiOfRecorder,
-    // playwright 相关
-    ...ipcMainApiOfPlaywright,
     // ffmpeg 相关
     ...ipcMainApiOfFfmpeg,
   };

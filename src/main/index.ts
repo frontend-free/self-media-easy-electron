@@ -9,11 +9,9 @@ const isDev = import.meta.env.MODE === 'development';
 
 function createWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
-    width: 1300,
-    height: 1000,
-    show: false,
-    autoHideMenuBar: true,
-    frame: false,
+    width: 1200,
+    height: 800,
+
     ...(process.platform === 'linux' ? { icon } : {}),
 
     webPreferences: {
@@ -53,9 +51,9 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window);
   });
 
-  const mainWindow = createWindow();
+  createWindow();
   // IPC init
-  initIpc({ mainWindow });
+  initIpc();
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
