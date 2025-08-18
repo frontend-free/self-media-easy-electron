@@ -1,34 +1,20 @@
 import { chromium } from 'playwright';
-import { log, processVideoStick, runTask } from '../helper';
+import { log, runTask } from '../helper';
 import { EnumCode, EnumPlatform, PlatformPublishParams, PlatformPublishResult } from '../types';
 
 async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPublishResult> {
-  const { title, resourceOfVideo: originalResourceOfVideo, adText, authInfo, isDebug } = params;
+  const { title, resourceOfVideo: originalResourceOfVideo, authInfo, isDebug } = params;
 
   const data: Partial<PlatformPublishResult> = {
     platform: EnumPlatform.TIKTOK,
     logs: [],
   };
 
-  let resourceOfVideo = originalResourceOfVideo;
+  const resourceOfVideo = originalResourceOfVideo;
 
   let browser;
 
   try {
-    if (adText) {
-      await runTask({
-        name: '处理文案',
-        logs: data.logs,
-        task: async () => {
-          log(`文案: ${adText}`, data.logs);
-          resourceOfVideo = await processVideoStick({
-            input: resourceOfVideo,
-            adText,
-          });
-        },
-      });
-    }
-
     browser = await chromium.launch({
       headless: false,
       channel: 'chrome',
@@ -65,7 +51,7 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       logs: data.logs,
       task: async () => {
         // 等待
-        await page.waitForTimeout(5000);
+        await page.waitForTimeout(2000);
 
         // 等待结果
         await Promise.race([
@@ -123,7 +109,7 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       name: '等待视频上传完成',
       logs: data.logs,
       task: async () => {
-        await page.waitForTimeout(5000);
+        await page.waitForTimeout(2000);
         const video = page.locator('[class^="phone-container-"] video');
         await video.waitFor({
           state: 'visible',
@@ -153,7 +139,7 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
         await coverInput.first().click();
 
         // 需要等待一下
-        await page.waitForTimeout(5000);
+        await page.waitForTimeout(2000);
 
         const finishButton = page.locator(
           '#tooltip-container button.semi-button .semi-button-content:text("完成")',
@@ -170,7 +156,7 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       logs: data.logs,
       task: async () => {
         // 需要等待一下，等表单处理好
-        await page.waitForTimeout(5000);
+        await page.waitForTimeout(2000);
 
         const publishButton = page.locator('button:text("发布")');
         await publishButton.waitFor({

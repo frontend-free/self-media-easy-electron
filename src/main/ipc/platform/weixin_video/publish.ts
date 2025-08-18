@@ -1,34 +1,20 @@
 import { chromium } from 'playwright';
-import { log, processVideoStick, runTask } from '../helper';
+import { log, runTask } from '../helper';
 import { EnumCode, EnumPlatform, PlatformPublishParams, PlatformPublishResult } from '../types';
 
 async function publishWeixinVideo(params: PlatformPublishParams): Promise<PlatformPublishResult> {
-  const { title, resourceOfVideo: originalResourceOfVideo, adText, authInfo, isDebug } = params;
+  const { title, resourceOfVideo: originalResourceOfVideo, authInfo, isDebug } = params;
 
   const data: Partial<PlatformPublishResult> = {
     platform: EnumPlatform.WEIXIN_VIDEO,
     logs: [],
   };
 
-  let resourceOfVideo = originalResourceOfVideo;
+  const resourceOfVideo = originalResourceOfVideo;
 
   let browser;
 
   try {
-    if (adText) {
-      await runTask({
-        name: '处理文案',
-        logs: data.logs,
-        task: async () => {
-          log(`文案: ${adText}`, data.logs);
-          resourceOfVideo = await processVideoStick({
-            input: resourceOfVideo,
-            adText,
-          });
-        },
-      });
-    }
-
     browser = await chromium.launch({
       // 特殊处理，true 就跑不通。
       headless: false,
@@ -68,7 +54,7 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
       logs: data.logs,
       task: async () => {
         // 等待
-        await page.waitForTimeout(5000);
+        await page.waitForTimeout(2000);
 
         // 等待结果
         await Promise.race([
@@ -131,7 +117,7 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
       logs: data.logs,
       task: async () => {
         // 需要等待一下，等表单处理好
-        await page.waitForTimeout(5000);
+        await page.waitForTimeout(2000);
 
         const publishButton = page.locator('button.weui-desktop-btn_primary:text-is("发表")');
         await publishButton.waitFor({
