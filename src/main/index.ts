@@ -2,7 +2,6 @@ import { optimizer } from '@electron-toolkit/utils';
 import { app, BrowserWindow, shell } from 'electron';
 import { join } from 'path';
 import icon from '../../resources/icon.png?asset';
-import './ad';
 import { initIpc } from './ipc';
 
 const isDev = import.meta.env.MODE === 'development';
