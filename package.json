@@ -1,10 +1,10 @@
 {
-  "name": "video-publish-record-electron",
+  "name": "self-media-easy-electron",
   "version": "1.0.0",
   "description": "短视频工具",
   "main": "./out/main/index.js",
   "author": "liyatang",
-  "homepage": "https://github.com/liyatang/video-publish-record-electron",
+  "homepage": "https://github.com/liyatang/self-media-easy-electron",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",

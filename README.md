@@ -1,4 +1,4 @@
-# video-publish-record-electron
+# self-media-easy-electron
 
 ## 开发
 
