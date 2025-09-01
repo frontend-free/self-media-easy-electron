@@ -148,6 +148,9 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       name: '点击发布按钮',
       logs: data.logs,
       task: async () => {
+        // 需要等待一下，等表单处理好
+        await page.waitForTimeout(2000);
+
         const publishButton = page.locator('button:text("发布")');
         await publishButton.waitFor({
           state: 'visible',
