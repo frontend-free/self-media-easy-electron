@@ -12,7 +12,7 @@ async function authCheckTiktok(params: PlatformAuthCheckParams): Promise<Platfor
 
   // 显示浏览器窗口
   const browser = await chromium.launch({
-    headless: true,
+    headless: false,
     channel: 'chrome',
   });
 
@@ -50,9 +50,6 @@ async function authCheckTiktok(params: PlatformAuthCheckParams): Promise<Platfor
       name: '确认授权信息是否有效',
       logs: data.logs,
       task: async () => {
-        // 等待
-        await page.waitForTimeout(2000);
-
         // 等待结果
         await Promise.race([
           // 如果还在当前页，则认为登录

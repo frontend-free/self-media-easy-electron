@@ -50,9 +50,6 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       name: '确认授权信息是否有效',
       logs: data.logs,
       task: async () => {
-        // 等待
-        await page.waitForTimeout(2000);
-
         // 等待结果
         await Promise.race([
           // 如果存在此按钮，则认为登录
@@ -109,7 +106,6 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       name: '等待视频上传完成',
       logs: data.logs,
       task: async () => {
-        await page.waitForTimeout(2000);
         const video = page.locator('[class^="phone-container-"] video');
         await video.waitFor({
           state: 'visible',
@@ -138,9 +134,6 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
         const coverInput = page.locator('.content-upload-new div:text("选择封面")');
         await coverInput.first().click();
 
-        // 需要等待一下
-        await page.waitForTimeout(2000);
-
         const finishButton = page.locator(
           '#tooltip-container button.semi-button .semi-button-content:text("完成")',
         );
@@ -155,9 +148,6 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       name: '点击发布按钮',
       logs: data.logs,
       task: async () => {
-        // 需要等待一下，等表单处理好
-        await page.waitForTimeout(2000);
-
         const publishButton = page.locator('button:text("发布")');
         await publishButton.waitFor({
           state: 'visible',
