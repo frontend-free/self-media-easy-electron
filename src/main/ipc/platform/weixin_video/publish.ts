@@ -53,6 +53,9 @@ async function publishWeixinVideo(params: PlatformPublishParams): Promise<Platfo
       name: '确认授权信息是否有效',
       logs: data.logs,
       task: async () => {
+        // 等待页面
+        await page.waitForTimeout(2000);
+
         // 等待结果
         await Promise.race([
           // 如果还在当前页，则认为登录

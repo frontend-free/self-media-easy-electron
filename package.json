@@ -1,6 +1,6 @@
 {
   "name": "self-media-easy-electron",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "短视频工具",
   "main": "./out/main/index.js",
   "author": "liyatang",

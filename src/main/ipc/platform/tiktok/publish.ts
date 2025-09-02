@@ -50,6 +50,9 @@ async function publishTiktok(params: PlatformPublishParams): Promise<PlatformPub
       name: '确认授权信息是否有效',
       logs: data.logs,
       task: async () => {
+        // 等待页面
+        await page.waitForTimeout(2000);
+
         // 等待结果
         await Promise.race([
           // 如果存在此按钮，则认为登录
